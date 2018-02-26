@@ -1,0 +1,9 @@
+@echo off
+regsvr32 bin\cswskax6.ocx /s
+regsvr32 bin\cswskax8.ocx /s
+regsvr32 bin\cswskax9.ocx /s
+regsvr32 fpservice.dll /s
+regsvr32 fpserver.dll /s
+regsvr32 fpclient.dll /s
+fpscm -install
+net start foxpages

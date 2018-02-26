@@ -1,0 +1,15 @@
+<fps>
+if type("Request.Cookies.SID") = "O" AND !empty(Request.Cookies.SID.Value) && Logout
+  *--- Locate session
+  use data\sessions
+  locate for session = Request.Cookies.SID.Value
+
+  *--- Remove session. The cookie will be removed by index.fxp when it dont find the session.
+  if !eof()
+    delete
+  endif
+endif
+
+*--- Redirect to initial page  
+HTTP.Redirect("/")
+</fps>

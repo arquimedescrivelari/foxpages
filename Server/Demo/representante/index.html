@@ -1,0 +1,672 @@
+<!DOCTYPE HTML>
+<html>
+<fps>
+LOCAL lLogued
+
+*--- Check user logued
+if type("Request.Cookies.SID") = "O" AND !empty(Request.Cookies.SID.Value)
+  *--- Locate session
+  use data\sessions
+  locate for session = Request.Cookies.SID.Value
+
+  *--- User logued
+  if !eof()
+    lLogued = .T.
+    cSeller   = sessions.seller
+  else
+    *--- User not logued, delete cookie
+    HTTP.SetCookie("SID","",datetime()-86400,,"/")
+  endif
+endif
+
+*--- Dont store in cache
+Response.Pragma = "no-cache"
+Response.Cache_Control = "no-cache, no-store, max-age=0"
+
+*--- If logued redirect
+if !lLogued
+</fps>
+  <head>
+    <meta charset="utf-8">
+    <title>Nycow : Entrar</title>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.3/dijit/themes/claro/claro.css" media="screen">
+    <link rel="stylesheet" href="/representante/css/index.css" media="screen">
+
+    <!-- Provide config via dojoConfig global and load dojo -->
+    <script>
+      var dojoConfig = (function(){
+        return {
+                async: true,
+                packages: [{
+                  name: "application",
+                  location: "/representante/js"
+                }]
+        };
+      })();
+      </script>
+  </head>
+  <body class="claro">
+    <!-- Overlay -->
+    <div id="loadingOverlay" class="pageOverlay">
+      <div class="loadingMessage">Carregando...</div>
+    </div>
+
+    <!-- Login -->
+    <div class="dijitHidden">
+      <div id="login" data-dojo-type="dijit/Dialog" data-dojo-props="title:'Entrar', closable:false" style="width: 350px">
+        <p><strong>Por favor informe o seu usuário e senha</strong></p>
+        <div class="row">
+          <label class="caption06" for="username">Usuário</label>
+          <input id="username" data-dojo-type="dijit/form/TextBox" placeholder="Digite seu email" />
+        </div>
+        <div class="row">
+          <label class="caption06" for="password">Senha</label>
+          <input type="password" id="password" data-dojo-type="dijit/form/TextBox" placeholder="Digite sua senha" />
+        </div>
+        <div class="row">
+          <label class="caption06"></label>
+          <input id="keepconnection" name="keepconnection" data-dojo-type="dijit/form/CheckBox" />
+          <label for="mycheck">Manter conectado</label>
+        </div>
+        <div class="center-row">
+          <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="loginOk">Entrar</button>
+          <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="loginCancel">Cancelar</button>
+        </div>
+      </div>
+    </div> 
+
+    <!-- Ok dialog -->
+    <div id="okDialog" data-dojo-type="dijit/Dialog" data-dojo-id="okDialog" data-dojo-props="title:'Título', draggable:'false'">
+      <p id="okDialogMessage" style="margin-top: 5px">Mensagem</p>
+      <div align="center">
+        <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="okDialogOK">OK</button>
+      </div>
+    </div>
+
+    <!-- Start -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojo/dojo.js"></script>
+    <script>
+      require(["application/login", "dojo/domReady!"], function(login) {
+          login.init();
+      });
+    </script>
+  </body>
+<fps>
+else
+</fps>
+  <head>
+    <meta charset="utf-8">
+    <title>Nycow : Representantes</title>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.3/dijit/themes/claro/claro.css" media="screen">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojox/grid/resources/Grid.css">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojox/grid/resources/claroGrid.css">
+    <link rel="stylesheet" href="/representante/css/index.css">
+
+    <!-- Provide config via dojoConfig global and load dojo -->
+    <script>
+      var dojoConfig = (function(){
+          return {
+                  async: true,
+                  packages: [{
+                      name: "application",
+                      location: "/representante/js"
+          }]
+        };
+      })();
+    </script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="../scripts/inputmask.min.js"></script>
+    <script type="text/javascript" src="../scripts/jquery.inputmask.min.js"></script>
+  </head>
+  <body class="claro">
+    <!-- Overlay -->
+    <div id="loadingOverlay" class="pageOverlay">
+      <div class="loadingMessage">Carregando...</div>
+    </div>
+
+    <!-- Main screen -->
+    <div id="borderContainer" data-dojo-type="dijit/layout/BorderContainer" dojo-data-props="design:'headline', gutters:false, liveSplitters:true">
+      <div id="topBar" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'">
+        <a href="/"><img src="/pics/logo.jpg"></a>
+        <div id="navMenu" data-dojo-type="dijit/MenuBar">
+          <div data-dojo-type="dijit/PopupMenuBarItem">
+            <span>Arquivo</span>
+            <div id="fileMenu" data-dojo-type="dijit/Menu">
+              <!--<div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuNewGroup">Novo grupo</div>-->
+              <div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuNewClient">Novo cliente</div>
+              <div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuNewOrder" disabled="true">Novo pedido</div>
+            </div>
+          </div>
+          <div data-dojo-type="dijit/PopupMenuBarItem">
+            <span>Editar</span>
+            <div id="editMenu" data-dojo-type="dijit/Menu">
+              <!--<div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuRenameGroup" disabled="true">Renomear Grupo</div>-->
+              <!--<div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuDeleteGroup" disabled="true">Excluir grupo</div>-->
+
+              <!--<div data-dojo-type="dijit/MenuSeparator"></div>-->
+
+              <div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuEditClient" disabled="true">Editar cliente</div>
+              <div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuMoveClient" disabled="true">Mover cliente</div>
+              <div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuDeleteClient" disabled="true">Excluir cliente</div>
+
+              <div data-dojo-type="dijit/MenuSeparator"></div>
+
+              <div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuEditOrder" disabled="true">Editar pedido</div>
+              <div data-dojo-type="dijit/MenuItem" data-dojo-id="mnuDeleteOrder" disabled="true">Excluir pedido</div>
+            </div>
+          </div>
+          <div data-dojo-type="dijit/MenuBarItem" data-dojo-id="mnuLogout">
+            Sair
+          </div>
+        </div>
+      </div>
+      <div id="mainSection" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="region:'center', gutters:true, liveSplitters:true">
+        <div id="treeSection" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:'true', region:'left'">
+          <div id="groupsTree" data-dojo-type="dijit/Tree" data-dojo-id="groupsTree" data-dojo-props="model:groupsModel"></div>
+        </div>
+        <div id="mainContainer" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', region:'center', gutters:true, liveSplitters:true">
+          <div id="gridSection" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top',splitter:true">
+            <table id="clientsGrid" data-dojo-type="dojox/grid/DataGrid" data-dojo-id="clientsGrid" data-dojo-props="columnReordering:true, clientSort:true, rowHeight:25, selectionMode:'single', store:clientsStore" noDataMessage="<span class='dojoxGridNoData'>Nenhum cliente neste grupo</span>">
+              <thead>
+                <tr>
+                  <th field="pe_nome" width="300px">Nome</th>
+                  <th field="cf_contato" width="100px">Contato</th>
+                  <th field="ed_tel_loc" width="100px">Telefone</th>
+                  <th field="pe_email" width="100%">E-mail</th>
+                </tr>
+              </thead>
+              <script type="dojo/method" event="onRowContextMenu" args="e">
+              </script>
+            </table>
+          </div>
+          <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+            <div id="dataSection" data-dojo-type="dijit/layout/TabContainer" data-dojo-id="dataSection" style="width: 100%; height: 100%;">
+              <div id="clientData" data-dojo-type="dijit/layout/ContentPane" data-dojo-id="clientData" title="Dados do cliente" data-dojo-props="selected:true">
+                <em>Selecione um cliente para consultar informações</em>
+              </div>
+              <div id="orderData"  data-dojo-type="dijit/layout/ContentPane" data-dojo-id="orderData" title="Pedidos">
+                <table id="ordersGrid" data-dojo-type="dojox/grid/DataGrid" data-dojo-id="ordersGrid" data-dojo-props="columnReordering:true, clientSort:true, rowHeight:25, selectionMode:'single', store:ordersStore" noDataMessage="<span class='dojoxGridNoData'>Nenhum pedido deste cliente</span>">
+                  <thead>
+                    <tr>
+                      <th field="pe_pedido" width="80px">Pedido</th>
+                      <th field="pe_data" formatter="formatDate" width="80px">Data</th>
+                      <th field="pe_receb" width="150px">Modo</th>
+                      <th field="pe_valort" formatter="formatCurrency" width="100px">Valor</th>
+                      <th field="pe_sitdes" width="100%">Situação</th>
+                    </tr>
+                  </thead>
+				  <script type="dojo/method" event="onRowContextMenu" args="e">
+                  </script>
+                </table>
+              </div>
+              <div id="billData" data-dojo-type="dijit/layout/ContentPane" data-dojo-id="billData" title="Em recebimento">
+                <table id="billsGrid" data-dojo-type="dojox/grid/DataGrid" data-dojo-id="billsGrid" data-dojo-props="columnReordering:true, clientSort:true, rowHeight:25, selectionMode:'single', store:billsStore" noDataMessage="<span class='dojoxGridNoData'>Nenhum título a receber deste cliente</span>">
+                  <thead>
+                    <tr>
+                      <th field="ti_contr" width="80px">Documento</th>
+                      <th field="ti_parc" width="40px">Parc</th>
+                      <th field="ti_vcto" formatter="formatDate" width="90px">Vencimento</th>
+                      <th field="ti_valor" formatter="formatCurrency" width="100px">Valor</th>
+                      <th field="vl_desc" formatter="formatCurrency" width="100px">Desconto</th>
+                      <th field="vl_multa" formatter="formatCurrency" width="100px">Multa</th>
+                      <th field="vl_corr" formatter="formatCurrency" width="100px">Correção</th>
+                      <th field="vl_debit" formatter="formatCurrency" width="100px">Valor total</th>
+                    </tr>
+                  </thead>
+				  <script type="dojo/method" event="onRowContextMenu" args="e">
+                  </script>
+                  <script type="dojo/method" event="canSort" args="col">
+				  	col = Math.abs(col)
+					
+				    if (col === 1 || col === 2 || col === 3 || col === 4 || col === 8) {
+					  return true;
+					} else {
+					  return false;
+					}
+                  </script>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New group dialog
+    <div id="newGroupDialog" data-dojo-type="dijit/Dialog" data-dojo-id="newGroupDialog" data-dojo-props="title:'Criar novo grupo', draggable:false">
+      <div id="newGroupForm" data-dojo-type="dijit/form/Form" data-dojo-id="newGroupForm">
+      	<div class="row">
+          <label class="caption10" for="new_group_name">Nome do grupo</label>
+          <input type="text" id="new_group_name" name="name" data-dojo-type="dijit/form/ValidationTextBox" required/>
+        </div>
+      	<div class="center-row">
+          <button type="submit" data-dojo-type="dojox/form/BusyButton" busyLabel="Aguarde..." timeout="2000">Salvar</button>
+          <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="newGroupCancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    -->
+    
+    <!-- Edit group dialog
+    <div id="editGroupDialog" data-dojo-type="dijit/Dialog" data-dojo-id="editGroupDialog" data-dojo-props="title:'Renomear grupo', draggable:false">
+      <div id="editGroupForm" data-dojo-type="dijit/form/Form" data-dojo-id="editGroupForm">
+        <input type="hidden" id="edit_group_id" name="id">
+        <div class="row">
+          <label class="caption10" for="edit_group_old">Nome antigo</label>
+          <input type="text" id="edit_group_old" name="oldname" data-dojo-type="dijit/form/TextBox" disabled="true"/>
+        </div>
+        <div class="row">
+          <label class="caption10" for="edit_group_name">Novo nome</label>
+          <input type="text" id="edit_group_name" name="name" data-dojo-type="dijit/form/ValidationTextBox" style="margin-bottom: 6px" required/>
+        </div>
+        <div class="center-row">
+          <button type="submit" data-dojo-type="dojox/form/BusyButton" busyLabel="Aguarde..." timeout="2000">Salvar</button>
+          <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="editGroupCancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    -->
+    
+    <!-- Edit client dialog -->
+    <div id="editClientDialog" data-dojo-type="dijit/Dialog" data-dojo-id="editClientDialog" data-dojo-props="title:'Editar cliente'">
+      <div id="editClientForm" data-dojo-type="dijit/form/Form" data-dojo-id="editClientForm">
+        <input type="hidden" id="edit_client_cf_codigo" name="cf_codigo" style="width:6em;" data-dojo-type="dijit/form/TextBox" readonly />
+      	<div class="row">
+          <label class="caption06" for="pe_nome">Nome</label>
+          <input type="text" id="edit_client_pe_nome" name="pe_nome" style="width:35em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" required />
+          <label class="caption06" for="cf_grupo">Grupo</label>
+          <select id="edit_client_cf_grupo" name="cf_grupo" style="width:8em;" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="searchAttr:'name'"></select>
+          <label class="caption06" for="cf_grupo">Tipo</label>
+          <select id="edit_client_pe_tipo" name="pe_tipo" style="width:8em;" data-dojo-type="dijit/form/FilteringSelect" required>
+            <option value="1">FÍSICA</option>
+            <option value="2">JURÍDICA</option>
+            <option value="3">INTERNACIONAL</option>
+          </select>
+        </div>
+        <div data-dojo-type="dijit/layout/TabContainer" style="overflow:auto; height:440px; width: 900px;">
+          <div data-dojo-type="dijit/layout/ContentPane" title="Informações" data-dojo-props="selected:true">
+            <div class="row">
+              <label class="caption10" for="ed_lograd">Endereço</label>
+              <input type="text" id="edit_client_ed_lograd" name="ed_lograd" style="width:29em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" required />
+              <label class="caption06" for="ed_numero">Número</label>
+              <input type="text" id="edit_client_ed_numero" name="ed_numero" style="width:4em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" required />
+              <label class="caption10" for="ed_compl">Complemento</label>
+              <input type="text" id="edit_client_ed_compl" name="ed_compl" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+            </div>
+            <table cellspacing="0" cellpadding="0">
+              <tr>
+                <td>
+                  <div class="row">
+                    <label class="caption10" for="ed_bairro">Bairro</label>
+                    <input type="text" id="edit_client_ed_bairro" name="ed_bairro" style="width:20em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" required />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="ed_cidade">Cidade</label>
+                    <input type="text" id="edit_client_ed_cidade" name="ed_cidade" style="width:20em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" required />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="ed_cidade">Estado</label>
+                    <select id="edit_client_ed_estado" name="ed_estado" style="width:5em;" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="searchAttr:'es_sigla'" required></select>
+                    <label class="caption06" for="ed_cep">CEP</label>
+                    <input type="text" id="edit_client_ed_cep" name="ed_cep" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" required />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="ed_mv_ibge">Município IBGE</label>
+                    <input type="text" id="edit_client_ed_mv_ibge" name="ed_mv_ibge" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" required />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="cf_contato">Contato</label>
+                    <input type="text" id="edit_client_cf_contato" name="cf_contato" style="width:10em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" required />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="ed_tel_loc">Telefone</label>
+                    <input type="text" id="edit_client_ed_tel_loc" name="ed_tel_loc" style="width:10em;" data-dojo-type="dijit/form/ValidationTextBox" required />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="ed_tel_rec">Telefone recados</label>
+                    <input type="text" id="edit_client_ed_tel_rec" name="ed_tel_rec" style="width:10em;" data-dojo-type="dijit/form/ValidationTextBox" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="ed_tel_fin">Telefone financeiro</label>
+                    <input type="text" id="edit_client_ed_tel_fin" name="ed_tel_fin" style="width:10em;" data-dojo-type="dijit/form/ValidationTextBox" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_tel_cel">Celular</label>
+                    <input type="text" id="edit_client_pe_tel_cel" name="pe_tel_cel" style="width:10em;" data-dojo-type="dijit/form/ValidationTextBox" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_radio">Radio</label>
+                    <input type="text" id="edit_client_pe_radio" name="pe_radio" style="width:10em;" data-dojo-type="dijit/form/ValidationTextBox" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_email">E-mail</label>
+                    <input type="text" id="edit_client_pe_email" name="pe_email" style="width:25em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="lowercase: true" required />
+                  </div>
+                </td>
+                <td valign="top">
+                  <div class="row">
+                    <label class="caption10" for="pe_cpf">CPF</label>
+                    <input type="text" id="edit_client_pe_cpf" name="pe_cpf" style="width:12em;" data-dojo-type="dijit/form/ValidationTextBox" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_rg_num">RG</label>
+                    <input type="text" id="edit_client_pe_rg_num" name="pe_rg_num" style="width:12em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_rg_emi">Emissor</label>
+                    <input type="text" id="edit_client_pe_rg_emi" name="pe_rg_emi" style="width:4em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+                    <label class="caption06" for="pe_rg_dte">Emissão</label>
+                    <input type="text" id="edit_client_pe_rg_dte" name="pe_rg_dte" style="width:8em;" data-dojo-type="dijit/form/DateTextBox" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_psp_num">Passaporte</label>
+                    <input type="text" id="edit_client_pe_psp_num" name="pe_psp_num" style="width:12em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_cnpj">CNPJ</label>
+                    <input type="text" id="edit_client_pe_cnpj" name="pe_cnpj" style="width:12em;" data-dojo-type="dijit/form/ValidationTextBox" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_ie">IE</label>
+                    <input type="text" id="edit_client_pe_ie" name="pe_ie" style="width:12em;" data-dojo-type="dijit/form/ValidationTextBox" />
+                    <label class="caption04" for="pe_im">IM</label>
+                    <input type="text" id="edit_client_pe_im" name="pe_im" style="width:12em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="pe_suframa">SUFRAMA</label>
+                    <input type="text" id="edit_client_pe_suframa" name="pe_suframa" style="width:12em;" data-dojo-type="dijit/form/ValidationTextBox" />
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="cf_mreceb">Modo</label>
+                    <select id="edit_client_cf_mreceb" name="cf_mreceb" style="width:297px;" data-dojo-type="dijit/form/FilteringSelect">
+                      <option value="1">DINHEIRO</option>
+                      <option value="2">CHEQUE</option>
+                      <option value="3">BOLETO</option>
+                      <option value="4">CARTÃO DE CRÉDITO</option>
+                      <option value="5">CARTÃO DE DÉBITO</option>
+                      <option value="6">DEPÓSITO</option>
+                      <option value="7">NÃO DEFINIDO</option>
+                    </select>
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="cf_receb">Recebimento</label>
+                    <select id="edit_client_cf_receb" name="cf_receb" style="width:297px;" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="searchAttr:'ct_descr'" required></select>
+                  </div>
+                  <div class="row">
+                    <label class="caption10" for="cf_transp">Transportadora</label>
+                    <select id="edit_client_cf_transp" name="cf_transp" style="width:30em;" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="searchAttr:'tr_descr'" required></select>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div data-dojo-type="dijit/layout/ContentPane" title="Outros endereços">
+            <div class="row">
+              <label class="caption12" for="ee_lograd">Endereço de entrega</label>
+              <input type="text" id="edit_client_ee_lograd" name="ee_lograd" style="width:30em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+              <label class="caption06" for="ee_numero">Número</label>
+              <input type="text" id="edit_client_ee_numero" name="ee_numero" style="width:4em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+              <label class="caption10" for="ee_compl">Complemento</label>
+              <input type="text" id="edit_client_ee_compl" name="ee_compl" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+            </div>
+            <div class="row">
+              <label class="caption12" for="ee_bairro">Bairro</label>
+              <input type="text" id="edit_client_ee_bairro" name="ee_bairro" style="width:20em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+	        </div>
+            <div class="row">
+              <label class="caption12" for="ee_cidade">Cidade</label>
+              <input type="text" id="edit_client_ee_cidade" name="ee_cidade" style="width:20em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+	        </div>
+            <div class="row">
+              <label class="caption12" for="ee_cidade">Estado</label>
+              <select id="edit_client_ee_estado" name="ee_estado" style="width:5em;" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="required: false, searchAttr:'es_sigla'"></select>
+              <label class="caption06" for="ee_cep">CEP</label>
+              <input type="text" id="edit_client_ee_cep" name="ee_cep" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" />
+            </div>
+            <div class="row">
+              <label class="caption12" for="ee_mv_ibge">Município IBGE</label>
+              <input type="text" id="edit_client_ee_mv_ibge" name="ee_mv_ibge" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" />
+            </div>
+            <div class="row">
+              <label class="caption12" for="ee_tel_loc">Telefone</label>
+              <input type="text" id="edit_client_ee_tel_loc" name="ee_tel_loc" style="width:10em;" data-dojo-type="dijit/form/ValidationTextBox" />
+            </div>
+            <hr/>
+            <div class="row">
+              <label class="caption12" for="ec_lograd">Endereço de cobrança</label>
+              <input type="text" id="edit_client_ec_lograd" name="ec_lograd" style="width:30em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+              <label class="caption06" for="ec_numero">Número</label>
+              <input type="text" id="edit_client_ec_numero" name="ec_numero" style="width:4em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+              <label class="caption10" for="ec_compl">Complemento</label>
+              <input type="text" id="edit_client_ec_compl" name="ec_compl" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+            </div>
+            <div class="row">
+              <label class="caption12" for="ec_bairro">Bairro</label>
+              <input type="text" id="edit_client_ec_bairro" name="ec_bairro" style="width:20em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+	        </div>
+            <div class="row">
+              <label class="caption12" for="ec_cidade">Cidade</label>
+              <input type="text" id="edit_client_ec_cidade" name="ec_cidade" style="width:20em;" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-props="uppercase: true" />
+	        </div>
+            <div class="row">
+              <label class="caption12" for="ec_cidade">Estado</label>
+              <select id="edit_client_ec_estado" name="ec_estado" style="width:5em;" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="required: false, searchAttr:'es_sigla'" ></select>
+              <label class="caption06" for="ec_cep">CEP</label>
+              <input type="text" id="edit_client_ec_cep" name="ec_cep" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" />
+            </div>
+            <div class="row">
+              <label class="caption12" for="ec_mv_ibge">Município IBGE</label>
+              <input type="text" id="edit_client_ec_mv_ibge" name="ec_mv_ibge" style="width:6em;" data-dojo-type="dijit/form/ValidationTextBox" />
+            </div>
+            <div class="row">
+              <label class="caption12" for="ec_tel_loc">Telefone</label>
+              <input type="text" id="edit_client_ec_tel_loc" name="ec_tel_loc" style="width:10em;" data-dojo-type="dijit/form/ValidationTextBox" />
+            </div>
+          </div>
+          <div data-dojo-type="dijit/layout/ContentPane" title="Observações">
+            <div class="row">
+              <label class="caption99" for="ec_mv_ibge">Observações internas (Não são impressas nos pedidos)</label>
+			</div>
+            <div class="row">
+			  <textarea id="edit_client_cf_obs" name="cf_obs" data-dojo-type="dijit/form/SimpleTextarea" rows="8" style="resize:none; width:99%;"></textarea>
+			</div>
+            <div class="row">
+              <label class="caption99" for="ec_mv_ibge">Observações dos pedidos (Impressas em todos pedidos)</label>
+			</div>
+            <div class="row">
+			  <textarea id="edit_client_cf_obscv" name="cf_obscv" data-dojo-type="dijit/form/SimpleTextarea" rows="8" style="resize:none; width:99%;"></textarea>
+			</div>
+          </div>
+		</div>
+        <div class="center-row">
+          <button type="submit" data-dojo-type="dojox/form/BusyButton" busyLabel="Aguarde..." timeout="2000">Salvar</button>
+          <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="editClientCancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Move client dialog -->
+    <div id="moveClientDialog" data-dojo-type="dijit/Dialog" data-dojo-id="moveClientDialog" data-dojo-props="title:'Mover cliente', draggable:false">
+      <div id="moveClientForm" data-dojo-type="dijit/form/Form" data-dojo-id="moveClientForm">
+        <input type="hidden" id="move_client_id" name="move_client_id" data-dojo-type="dijit/form/TextBox" readonly />
+      	<div class="row">
+          <label class="caption08" for="move_client_name">Cliente</label>
+          <input type="text" id="move_client_name" name="move_client_name" data-dojo-type="dijit/form/TextBox" disabled="true" style="width: 20em;" />
+        </div>
+       	<div class="row">
+          <label class="caption08" for="move_client_group">Grupo</label>
+          <select id="move_client_group" name="move_client_group" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="searchAttr:'name'" style="margin-bottom: 6px; width: 20em;" required></select>
+        </div>
+      	<div class="center-row">
+          <button type="submit" data-dojo-type="dojox/form/BusyButton" busyLabel="Aguarde..." timeout="2000">Salvar</button>
+          <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="moveClientCancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit order dialog -->
+    <div id="editOrderDialog" data-dojo-type="dijit/Dialog" data-dojo-id="editOrderDialog" data-dojo-props="title:'Editar pedido'" style="width: 740px">
+      <div id="editOrderForm" data-dojo-type="dijit/form/Form" data-dojo-id="editOrderForm">
+        <input type="hidden" id="edit_order_pe_codigo" name="pe_codigo" data-dojo-type="dijit/form/TextBox" />
+        <input type="hidden" id="edit_order_pe_clifor" name="pe_clifor" data-dojo-type="dijit/form/TextBox" />
+      	<div class="row">
+          <label class="caption10" for="pe_nome">Pedido</label>
+          <input type="text" id="edit_order_pe_pedido" name="pe_pedido" style="width:8em;" data-dojo-type="dijit/form/TextBox" readonly />
+          <label class="caption06" for="cf_grupo">Situação</label>
+          <select id="edit_order_pe_situac" name="pe_situac" style="width:8em;" data-dojo-type="dijit/form/FilteringSelect" readonly>
+            <option value="1">ABERTO</option>
+            <option value="2">FECHADO</option>
+            <option value="3">FATURANDO</option>
+            <option value="4">FATURADO</option>
+            <option value="5">CANCELADO</option>
+            <option value="6">APROVANDO</option>
+            <option value="7">APROVADO</option>
+            <option value="8">REPROVADO</option>
+          </select>
+        </div>
+      	<div class="row">
+          <label class="caption10" for="pe_nome">Cliente</label>
+          <input type="text" id="edit_order_pe_nome" name="pe_nome" style="width:35em;" data-dojo-type="dijit/form/TextBox" readonly />
+        </div>
+        <div data-dojo-type="dijit/layout/TabContainer" style="overflow:auto; margin-bottom: 1em;  height:360px; width: 720px;">
+          <div data-dojo-type="dijit/layout/ContentPane" title="Informações" data-dojo-props="selected:true">
+			<div style="float:left; width: 67%;">
+              <div class="row">
+                <label class="caption12" for="pe_nome">Recebimento</label>
+                <select id="edit_order_pe_receb" name="pe_receb" style="width:297px;" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="searchAttr:'ct_descr'" required></select>
+              </div>
+              <div class="row">
+                <label class="caption12" for="pe_mreceb">Modo</label>
+                <select id="edit_order_pe_mreceb" name="pe_mreceb" style="width:297px;" data-dojo-type="dijit/form/FilteringSelect">
+                  <option value="1">DINHEIRO</option>
+                  <option value="2">CHEQUE</option>
+                  <option value="3">BOLETO</option>
+                  <option value="4">CARTÃO DE CRÉDITO</option>
+                  <option value="5">CARTÃO DE DÉBITO</option>
+                  <option value="6">DEPÓSITO</option>
+                  <option value="7">NÃO DEFINIDO</option>
+                </select>
+              </div>
+              <div class="row">
+                <label class="caption12" for="pe_numped">Pedido do cliente</label>
+                <input type="text" id="edit_order_pe_numped" name="pe_numped" style="width:8em;" data-dojo-type="dijit/form/TextBox"/>
+              </div>
+              <div class="row">
+                <label class="caption12" for="pe_numven">Pedido do vendedor</label>
+                <input type="text" id="edit_order_pe_numven" name="pe_numven" style="width:8em;" data-dojo-type="dijit/form/TextBox"/>
+              </div>
+			  <div class="row">
+				<label class="caption12" for="pe_transp">Transportadora</label>
+				<select id="edit_order_pe_transp" name="pe_transp" style="width:297px;" data-dojo-type="dijit/form/FilteringSelect" data-dojo-props="searchAttr:'tr_descr'"></select>
+			  </div>
+              <div class="row" style="vertical-align:text-top;">
+                <label class="caption12" for="pe_obs">Observações</label>
+                <textarea id="edit_order_pe_obs" name="pe_obs" data-dojo-type="dijit/form/SimpleTextarea" rows="8" style="resize:none; width:293px;"></textarea>
+              </div>
+            </div>
+			<div style="float:left; width: 33%;">
+              <div class="row">
+                <label class="caption10" for="pe_data">Data do pedido</label>
+                <input type="text" id="edit_order_pe_data" name="pe_data" style="width:8em;" data-dojo-type="dijit/form/DateTextBox"/>
+              </div>
+              <div class="row">
+                <label class="caption10" for="pe_datent">Data de entrega</label>
+                <input type="text" id="edit_order_pe_datent" name="pe_datent" style="width:8em;" data-dojo-type="dijit/form/DateTextBox"/>
+              </div>
+              <div class="row">
+                <label class="caption10" for="pe_cobr">Data de cobrança</label>
+                <input type="text" id="edit_order_pe_cobr" name="pe_cobr" style="width:8em;" data-dojo-type="dijit/form/DateTextBox"/>
+              </div>
+              <div class="row">
+                <label class="caption10" for="pe_valort">Sub total</label>
+                <input type="text" id="edit_order_pe_valor" name="pe_valor" style="width:8em;" data-dojo-type="dijit/form/CurrencyTextBox" data-dojo-props="constraints:{fractional:true}, currency:'R$ '" readonly />
+              </div>
+              <div class="row">
+                <label class="caption10" for="pe_valort">Acréscimo</label>
+                <input type="text" id="edit_order_pe_acres" name="pe_acres" style="width:8em;" data-dojo-type="dijit/form/CurrencyTextBox" data-dojo-props="constraints:{fractional:true}, currency:'R$ '" readonly />
+              </div>
+              <div class="row">
+                <label class="caption10" for="pe_valort">Desconto</label>
+                <input type="text" id="edit_order_pe_desc" name="pe_desc" style="width:8em;" data-dojo-type="dijit/form/CurrencyTextBox" data-dojo-props="constraints:{fractional:true}, currency:'R$ '" readonly />
+              </div>
+              <div class="row">
+                <label class="caption10" for="pe_valort">Valor total</label>
+                <input type="text" id="edit_order_pe_valort" name="pe_valort" style="width:8em;" data-dojo-type="dijit/form/CurrencyTextBox" data-dojo-props="constraints:{fractional:true}, currency:'R$ '" readonly />
+              </div>
+            </div>
+          </div>
+          <div data-dojo-type="dijit/layout/ContentPane" title="Itens" data-dojo-props="selected:true">
+            <div class="row" style="height:270px;">
+              <table id="itensGrid" data-dojo-type="dojox/grid/DataGrid" data-dojo-id="itensGrid" data-dojo-props="rowHeight:25, onApplyCellEdit: itensEdit, store:itensStore" noDataMessage="<span class='dojoxGridNoData'>Nenhum item neste pedido</span>">
+                <thead>
+                  <tr>
+                    <th field="pi_prod" cellType="dojox.grid.cells._Widget" widgetClass="dijit.form.Textbox" width="80px">Produto</th>
+                    <th field="pi_prod" cellType="dojox.grid.cells._Widget" widgetClass="dijit.form.FilteringSelect" widgetProps="{searchAttr:'pr_descr'}" editable="true" formatter="formatProduct" width="200px">Descrição</th>
+                    <th field="pi_quant" cellType="dojox.grid.cells._Widget" widgetClass="dijit.form.NumberTextBox" editable="true" constraint="{places: '0,6'}" width="50px">Quant</th>
+                    <th field="pi_moeda" cellType="dojox.grid.cells._Widget" widgetClass="dijit.form.TextBox" width="50px">Moeda</th>
+                    <th field="pi_valor" cellType="dojox.grid.cells._Widget" widgetClass="dijit.form.NumberTextBox" editable="true" constraint="{places: '0,2'}" formatter="formatCurrency" width="80px">Valor</th>
+                    <th field="pi_desc" cellType="dojox.grid.cells._Widget" widgetClass="dijit.form.NumberTextBox" editable="true" constraint="{places: '0,2'}" formatter="formatPercentage" width="50px">% Desc</th>
+                    <th field="pi_valort" cellType="dojox.grid.cells._Widget" widgetClass="dijit.form.TextBox" formatter="formatCurrency" width="80px">Total</th>
+                  </tr>
+                </thead>
+                <script type="dojo/method" event="onRowContextMenu" args="e">
+                </script>
+                <script type="dojo/method" event="canSort" args="col">
+                    return false;
+                </script>
+                <script type="dojo/method" event="canEdit" args="a,b">
+                    return dijit.byId('edit_order_pe_situac').get('value') === "1";
+                </script>
+              </table>
+            </div>
+            <div class="center-row">
+              <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="editOrderAddItem">Adicionar item</button>
+              <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="editOrderDeleteItem">Excluir item</button>
+            </div>
+          </div>
+        </div>
+        <div class="center-row">
+          <button type="submit" data-dojo-type="dojox/form/BusyButton" data-dojo-id="editOrderSubmit" busyLabel="Aguarde..." timeout="2000">Salvar</button>
+          <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="editOrderCancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ok dialog -->
+    <div id="okDialog" data-dojo-type="dijit/Dialog" data-dojo-id="okDialog" data-dojo-props="title:'Título', draggable:'false'">
+      <p id="okDialogMessage" style="margin-top: 5px">Mensagem</p>
+      <div align="center">
+        <button type="button" data-dojo-type="dijit/form/Button" data-dojo-id="okDialogOK">OK</button>
+      </div>
+    </div>
+
+    <!-- Popups
+    <div data-dojo-type="dijit/Menu" data-dojo-props="targetNodeIds:['groupsTree']" style="display: none;">
+      <div data-dojo-type="dijit/MenuItem" data-dojo-id="ctxMnuRenameGroup" disabled="true">Renomear grupo</div>
+      <div data-dojo-type="dijit/MenuItem" data-dojo-id="ctxMnuDeleteGroup" disabled="true">Excluir grupo</div>
+    </div>
+     -->
+    
+    <div data-dojo-type="dijit/Menu" id="gridMenu" data-dojo-props="targetNodeIds:['clientsGrid']">
+      <div data-dojo-type="dijit/MenuItem" data-dojo-id="ctxMnuEditClient" disabled="true">Editar cliente</div>
+      <div data-dojo-type="dijit/MenuItem" data-dojo-id="ctxMnuMoveClient"  disabled="true">Mover cliente</div>
+      <div data-dojo-type="dijit/MenuItem" data-dojo-id="ctxMnuDeleteClient" disabled="true">Excluir cliente</div>
+    </div>
+
+    <div data-dojo-type="dijit/Menu" data-dojo-props="targetNodeIds:['ordersGrid']" style="display: none;">
+      <div data-dojo-type="dijit/MenuItem" data-dojo-id="ctxMnuEditOrder" disabled="true">Editar pedido</div>
+      <div data-dojo-type="dijit/MenuItem" data-dojo-id="ctxMnuDeleteOrder" disabled="true">Excluir pedido</div>
+    </div>
+
+    <!-- Start -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojo/dojo.js"></script>
+    <script>
+        require(["application/main", "dojo/domReady!"], function(main) {
+            main.init();
+        });
+    </script>
+  </body>
+<fps>
+endif
+</fps>
+</html>

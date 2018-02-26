@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta name="description" content="Indústria e Comércio de Bolsas e Mochilas. Conheça nossos produtos!">
+    <meta name="keywords" content="produto, bolsas, malas, mochilas, capas, notebook, nycow">
+    <meta name="robots" content="index, follow"> 
+    <meta content="pt-br" http-equiv="Content-Language">
+    <title>NYCOW | Malas, Bolas e Mochilas.</title>
+    <script type="text/javascript" src="/scripts/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/scripts/menu_jquery.js"></script>
+    <link rel="stylesheet" href="/index.css" type="text/css" />
+  </head>
+  <body>
+    <fps>
+      <div class="container">
+        HTML.Include("/header.fxp")
+
+        strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - malas.fpx"+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+        use products\products
+        locate for grupo = Request.Query_String
+
+        <div class="content">
+          <div class="subcontent">
+          <div class="contentitle"><e>alltrim(grupo)</e></div>
+
+          cLinha = ""
+
+          scan
+            if grupo # Request.Query_String
+               loop
+            endif
+
+            if cLinha # linha
+               cLinha = linha
+               <div class="contenttitlefull" id="<e>alltrim(linha)</e>">
+                 <div class="contenttitleback">
+                   <div class="contenttype"><e>alltrim(linha)</e></div>
+                 </div>
+               </div>
+            endif
+
+            <a class="cont-square" href="/products/details.fxp?<e>alltrim(codigo)</e>">
+              <div class="cont-squareimage"><img src="/pics/products/<e>alltrim(codigo)</e>.png" width="150" height="180"></div>
+              <div class="cont-squaretitle"><e>codigo</e></div>
+            </a>
+          endscan
+          </div>
+        </div>
+
+        HTML.Include("/footer.fxp")
+      </div>
+    </fps>
+  </body>
+</html>

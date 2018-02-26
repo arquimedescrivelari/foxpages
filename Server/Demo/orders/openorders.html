@@ -1,0 +1,121 @@
+<fps>
+LOCAL lLogued
+
+*--- Check user logued
+if Request.Method = "GET" AND type("Request.Cookies.SID") = "O" AND !empty(Request.Cookies.SID.Value)
+  *--- Locate session
+  use data\sessions
+  locate for session = Request.Cookies.SID.Value
+
+  *--- User logued
+  if !eof()
+    lLogued = .T.
+    cUserName = sessions.username
+	cCustomer = sessions.customer
+  endif
+
+  *--- Close sessions table
+  use
+endif
+
+*--- If not logued redirect
+if !lLogued
+  *--- User logued
+  HTTP.Redirect("/")
+  return
+endif
+</fps>
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store" >
+    <meta http-equiv="Pragma" content="no-cache, no-store" >
+    <meta http-equiv="Expires" content="Mon, 06 Jan 1990 00:00:01 GMT">
+    <title>NYCOW | Malas, Bolsas e Mochilas.</title>
+    <link rel="stylesheet" href="/index.css" type="text/css" />
+    <script type="text/javascript" src="/scripts/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/scripts/menu_jquery.js"></script>
+    <script type="text/javascript" src="/scripts/scripts.js"></script>
+  </head>
+  <body>
+    <fps>
+      <div class="container">
+        HTML.Include("/header.fxp")
+
+        *--- Log
+        strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - delivorders.fpx - "+cCustomer+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+        *--- Open database
+        open database icv
+
+        *--- Create System Object
+        System = newobject("oSystem","main.prg")
+
+        *--- Connect
+        System.Connect()
+
+        <div class="content">
+          <div class="subcontent">
+            <div class="orders">
+              <div class="orders-title">Pedidos abertos</div>
+              <div class="orders-subtitle">Pedido</div>
+              <div class="orders-subtitle">Data</div>
+              <div class="orders-subtitle">Valor</div>
+              <div class="orders-subtitle">Situação</div>
+
+              SQLClifor = cCustomer
+              use "ultimos pedidos" alias pedidos
+              use "nfes do pedido de venda" alias nfes nodata in 0
+              use "itinerarios do pedido de venda" alias itinerarios nodata in 0
+
+              scan
+                SQLCode = pedidos.pe_codigo
+                select nfes
+                requery()
+
+                SQLCode = "PV"+pedidos.pe_pedido
+                select itinerarios
+                requery()
+
+                if itinerarios.it_situac = 2
+                  loop
+                endif
+
+                select pedidos
+                <div class="order">
+                  <div class="order-number"><a href="javascript:loadHTML('/orders/details.fxp?<e>pe_codigo</e>','order<e>alltrim(str(recno()))</e>');"><e>pe_pedido</e></a></div>
+                  <div class="order-date"><e>pe_data</e></div>
+                  <div class="order-total">R$ <e>alltrim(transform(pe_valort,[@R 999,999,999.99]))</e></div>
+                  do case
+                  case !eof("itinerarios")
+                    if itinerarios.it_situac = 2
+                      <div class="order-situation">ENTREGUE</div>
+                    else
+                      <div class="order-situation">ENTREGANDO</div>
+                    endif
+                  case !eof("nfes")
+                    <div class="order-situation">FATURADO</div>
+                  case pedidos.pe_situac = 2
+                    <div class="order-situation">APROVADO</div>
+                  case pedidos.pe_situac = 1
+                    <div class="order-situation">ABERTO</div>
+                  endcase
+                  <div class="details" id="order<e>alltrim(str(recno()))</e>"></div>
+                </div>
+              endscan
+            </div>
+          </div>
+        </div>
+
+        HTML.Include("/footer.fxp")
+
+        *--- Release System object
+        release System
+
+        *--- Release class
+        clear class main
+      </div>
+    </fps>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta name="description" content="Indústria e Comércio de Bolsas e Mochilas. Conheça nossos produtos!">
+    <meta name="keywords" content="produto, bolsas, malas, mochilas, capas, notebook, nycow">
+    <meta name="robots" content="index, follow"> 
+    <meta content="pt-br" http-equiv="Content-Language">
+    <title>NYCOW | Malas, Bolsas e Mochilas.</title>
+    <link rel="stylesheet" href="index.css" type="text/css" />
+    <script type="text/javascript" src="/scripts/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/scripts/menu_jquery.js"></script>
+  </head>
+  <body>
+    <fps>
+      *--- Verificar dados do email
+      do case
+      case empty(Request.Variables.Empresa.Value) AND empty(Request.Variables.Contato.Value)
+        <script type='text/javascript'>alert('Empresa ou contato deve ser informado.');window.history.back();</script>
+      case empty(Request.Variables.Cidade.Value)
+        <script type='text/javascript'>alert('Cidade deve ser informada.');window.history.back();</script>
+      case empty(Request.Variables.Estado.Value)
+        <script type='text/javascript'>alert('Estado deve ser informado.');window.history.back();</script>
+      case empty(Request.Variables.Email.Value)
+        <script type='text/javascript'>alert('Email deve ser informado.');window.history.back();</script>
+      case !("@" $ Request.Variables.Email.Value) OR !("." $ Request.Variables.Email.Value) 
+        <script type='text/javascript'>alert('Email informado inválido.');window.history.back();</script>
+      case empty(Request.Variables.Telefone.Value)
+        <script type='text/javascript'>alert('Telefone deve ser informado.');window.history.back();</script>
+      case empty(Request.Variables.Comentarios.Value)
+        <script type='text/javascript'>alert('Comentário deve ser informado.');window.history.back();</script>
+      otherwise
+        <div class="container">
+          HTML.Include("/header.fxp")
+
+          <div class="content">
+            <div class="subcontent">
+              <div class="contenttitlefull">
+                <div class="contenttitleback">
+                  <div class="contenttype">Contato</div>
+                </div>
+              </div>
+              <div class="contenttext">
+                #DEFINE CRLF chr(13)+chr(10)
+
+                LOCAL loSMTP
+                loSMTP = createobject("FPClient.SMTP")
+                loSMTP.Hostname = "smtp.youremailserver.com"
+                loSMTP.Port = 587
+                loSMTP.From = strconv(Request.Variables.Email.Value,11)
+                loSMTP.From_Name =  strconv(Request.Variables.Contato.Value,11)
+                loSMTP.Username = "youremail@youremailserver.com"
+                loSMTP.Password = "yourpassword"
+                loSMTP.To = "youremail@youremailserver.com"
+                loSMTP.To_Name = "yourname"
+                loSMTP.Subject = "Email do site"
+                loSMTP.Message = strconv(iif(!empty(Request.Variables.Empresa.Value),"Empresa: "+Request.Variables.Empresa.Value+CRLF,"")+;
+                                 iif(!empty(Request.Variables.Contato.Value),"Contato: "+Request.Variables.Contato.Value+CRLF,"")+;
+                                 iif(!empty(Request.Variables.Cidade.Value),"Cidade: "+Request.Variables.Cidade.Value+CRLF,"")+;
+                                 iif(!empty(Request.Variables.Estado.Value),"Estado: "+Request.Variables.Estado.Value+CRLF,"")+;
+                                 iif(!empty(Request.Variables.Telefone.Value),"Telefone: "+Request.Variables.Telefone.Value+CRLF,"")+;
+                                 iif(!empty(Request.Variables.Comentarios.Value),"Comentários: "+Request.Variables.Comentarios.Value+CRLF,""),11)
+
+                if !loSMTP.Send()
+                  <e>loSMTP.ErrorMsg</e>
+                else
+                  <t>Email enviado com sucesso!</t>
+                endif
+
+                release loSMTP
+              </div>
+            </div>
+          </div>
+
+          HTML.Include("/footer.fxp")
+        </div>
+      endcase
+    </fps>
+  </body>
+</html>

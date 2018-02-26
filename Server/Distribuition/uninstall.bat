@@ -1,0 +1,8 @@
+@echo off
+fpscm -remove
+regsvr32 fpclient.dll -u /s
+regsvr32 fpserver.dll -u /s
+regsvr32 fpservice.dll -u /s
+regsvr32 bin\cswskax6.ocx -u /s
+regsvr32 bin\cswskax8.ocx -u /s
+regsvr32 bin\cswskax9.ocx -u /s

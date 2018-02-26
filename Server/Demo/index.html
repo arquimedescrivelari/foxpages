@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta name="description" content="Indústria e Comércio de Bolsas e Mochilas. Conheça nossos produtos!">
+    <meta name="keywords" content="produto, bolsas, malas, mochilas, capas, notebook, nycow">
+    <meta name="robots" content="index, follow"> 
+    <meta content="pt-br" http-equiv="Content-Language">
+    <title>NYCOW | Malas, Bolsas e Mochilas.</title>
+    <link rel="stylesheet" href="index.css" type="text/css" />
+    <script type="text/javascript" src="/scripts/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/scripts/menu_jquery.js"></script>
+    <script type="text/javascript" src="/slider/jquery.nivo.slider.js"></script>
+    <script type="text/javascript">
+      $(window).load(function() {
+        $('#slider').nivoSlider();
+      });
+      $(function() {
+        $('.sdt_menu > li').bind('mouseenter',function(){
+          var $elem = $(this);
+          $elem.find('img')
+          .stop(true)
+          .animate({
+            'width':'130px',
+            'height':'85px',
+            'left':'0px'
+          },400,'easeOutBack')
+          .andSelf()
+          .find('.sdt_wrap')
+          .stop(true)
+          .animate({'top':'100px'},500,'easeOutBack')
+          .andSelf()
+          .find('.sdt_active')
+          .stop(true)
+          .animate({'height':'40px'},300,function(){
+          var $sub_menu = $elem.find('.sdt_box');
+          if($sub_menu.length){
+            var left = '170px';
+            if($elem.parent().children().length == $elem.index()+1)
+              left = '-170px';
+              $sub_menu.show().animate({'left':left},200);
+            }	
+          });
+        }).bind('mouseleave',function(){
+          var $elem = $(this);
+          var $sub_menu = $elem.find('.sdt_box');
+          if($sub_menu.length)
+            $sub_menu.hide().css('left','0px');
+            $elem.find('.sdt_active')
+            .stop(true)
+            .animate({'height':'0px'},300)
+            .andSelf().find('img')
+            .stop(true)
+            .animate({
+              'width':'0px',
+              'height':'0px',
+              'left':'65px'},400)
+            .andSelf()
+            .find('.sdt_wrap')
+            .stop(true)
+            .animate({'top':'40px'},500);
+        });
+      });
+    </script>
+  </head>
+  <body>
+  <fps>
+    <div class="container">
+      HTML.Include("/header.fxp")
+
+      strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - index.fpx"+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+      <div class="wrapper" id="wrapper">
+        <div class="wrapper-slider theme-default">
+          <div class="nivoSlider" id="slider">
+            <img src="slider/images/nycow02.jpg" data-thumb="slider/images/nycow02.jpg" alt="MALAS TRAVEL"/>
+            <img src="slider/images/nycow03.jpg" data-thumb="slider/images/nycow03.jpg" alt="CAPAS PARA NOTEBOOK"/>
+          </div>
+        </div>
+      </div>
+      <a class="square" href="/products/group.fxp?Malas#Travel">
+        <div class="square-title">travel</div>
+        <div class="square-subtitle">Malas arrojadas</div>
+        <div class="square-image"><img src="/pics/products/NY3511.png"></div>
+        <div class="square-link">+ VEJA MAIS</div>
+      </a>
+      <a class="square" href="/products/group.fxp?Malas">
+        <div class="square-title">malas</div>
+        <div class="square-subtitle">Conjuntos de malas</div>
+        <div class="square-image"><img src="/pics/products/MDJG02.png"></div>
+        <div class="square-link">+ VEJA MAIS</div>
+      </a>
+      <a class="square" href="/products/group.fxp?Mochilas">
+        <div class="square-title">mochilas</div>
+        <div class="square-subtitle">Indispensável no trabalho</div>
+        <div class="square-image"><img src="/pics/products/NY304.png"></div>
+        <div class="square-link">+ VEJA MAIS</div>
+      </a>
+      <a class="square" href="/products/group.fxp?Pastas">
+        <div class="square-title">casual</div>
+        <div class="square-subtitle">Para todos os momentos</div>
+        <div class="square-image"><img src="/pics/products/NY801.png"></div>
+        <div class="square-link">+ VEJA MAIS</div>
+      </a>
+      <a class="square" href="/products/group.fxp?Pastas">
+        <div class="square-title">notebook</div>
+        <div class="square-subtitle">Protege com estilo</div>
+        <div class="square-image"><img src="/pics/products/NY502.png"></div>
+        <div class="square-link">+ VEJA MAIS</div>
+      </a>
+      HTML.Include("/footer.fxp")
+    </div>
+  </fps>
+  </body>
+</html>

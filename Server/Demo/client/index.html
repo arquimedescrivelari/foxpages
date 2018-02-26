@@ -1,0 +1,136 @@
+<fps>
+  LOCAL lLogued
+
+  *--- Check user logued
+  if Request.Method = "GET" AND type("Request.Cookies.SID") = "O" AND !empty(Request.Cookies.SID.Value)
+    *--- Locate session
+    use data\sessions
+    locate for session = Request.Cookies.SID.Value
+
+    *--- User logued
+    if !eof()
+      lLogued = .T.
+      cUserName = sessions.username
+      cCustomer = sessions.customer
+      cSeller   = sessions.seller
+    endif
+
+    *--- Close sessions table
+    use
+  endif
+
+  *--- If not logued redirect
+  if !lLogued
+    *--- User logued
+    HTTP.Redirect("/")
+    return
+  endif
+</fps>
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store" >
+    <meta http-equiv="Pragma" content="no-cache, no-store" >
+    <meta http-equiv="expires" content="Mon, 06 Jan 1990 00:00:01 GMT">
+    <title>NYCOW | Malas, Bolsas e Mochilas.</title>
+    <link rel="stylesheet" href="/index.css" type="text/css" />
+    <script type="text/javascript" src="/scripts/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/scripts/menu_jquery.js"></script>
+  </head>
+  <body>
+    <fps>
+      <div class="container">
+        HTML.Include("/header.fxp")
+        <div class="content">
+          <div class="subcontent">
+            if !empty(cCustomer)
+              <div class="client">
+                <div class="client-title-back"><strong class="client-title">Área do cliente</strong></div>
+              </div>
+              <div class="client">
+                <div class="client-subtitle">Pedidos</div>
+                <div class="client-minitext">Acompanhe seus pedidos</div>
+                <div class="client-buttons">
+                  <a class="client-button" href="/orders/openorders.fxp">Pedidos em aberto</a>
+                  <a class="client-button" href="/orders/delivorders.fxp">Pedidos entregues</a>
+                  <a class="client-button" href="/orders/lastorders.fxp">Últimos pedidos</a>
+                </div>
+              </div>
+              <div class="client">
+                <div class="client-subtitle">Financeiro</div>
+                <div class="client-minitext">Consulte seus boletos bancários</div>
+                <div class="client-buttons">
+                  <a class="client-button" href="/services/openbank.fxp">Boletos em aberto</a>
+                  <a class="client-button" href="/services/paidbank.fxp">Boletos pagos</a>
+                  <a class="client-button" href="/services/lastbank.fxp">Últimos boletos</a>
+                </div>
+              </div>
+              <div class="client">
+                <div class="client-subtitle">Faturamento</div>
+                <div class="client-minitext">Consulte seus faturamentos</div>
+                <div class="client-buttons">
+                  <a class="client-button" href="/services/lastnfes.fxp">Notas fiscais</a>
+                </div>
+              </div>
+            endif
+            if !empty(cSeller)
+              <div class="client">
+                <div class="client-title-back"><strong class="client-title">Área do representante</strong></div>
+              </div>
+              <div class="client">
+                <div class="client-subtitle">Pedidos</div>
+                <div class="client-minitext">Acompanhe seus pedidos</div>
+                <div class="client-buttons">
+                  for lnCtrl = -2 to 0
+                    lcMes = transform(month(gomonth(date(),lnCtrl)),"@L 99")
+                    lcAno = str(year(gomonth(date(),lnCtrl)),4)
+                    <a class="client-button">Pedidos de venda - <e>lcMes+"/"+lcAn</e></a>
+                  next
+                </div>
+              </div>
+              <div class="client">
+                <div class="client-subtitle">Faturamentos</div>
+                <div class="client-minitext">Acompanhe o faturamento dos seus pedidos</div>
+                <div class="client-buttons">
+                  for lnCtrl = -2 to 0
+                    lcMes = transform(month(gomonth(date(),lnCtrl)),"@L 99")
+                    lcAno = str(year(gomonth(date(),lnCtrl)),4)
+                    <a class="client-button">Faturamentos - <e>lcMes+"/"+lcAno</e></a>
+                  next
+                </div>
+              </div>
+              <div class="client">
+                <div class="client-subtitle">Produtos</div>
+                <div class="client-minitext">Acompanhe seus produtos vendidos</div>
+                <div class="client-buttons">
+                  for lnCtrl = -2 to 0
+                    lcMes = transform(month(gomonth(date(),lnCtrl)),"@L 99")
+                    lcAno = str(year(gomonth(date(),lnCtrl)),4)
+                    <a class="client-button">Grade - <e>lcMes+"/"+lcAno</e></a>
+                  next
+                </div>
+              </div>
+              <div class="client">
+                <div class="client-subtitle">Financeiro</div>
+                <div class="client-minitext">Informações financeiras</div>
+                <div class="client-buttons">
+                    <a class="client-button">Títulos a receber</a>
+                </div>
+              </div>
+              <div class="client">
+                <div class="client-subtitle">Estoque</div>
+                <div class="client-minitext">Grade de prdutos disponíveis</div>
+                <div class="client-buttons">
+                    <a class="client-button">Grade de estoque líquido</a>
+                </div>
+              </div>
+            endif
+          </div>
+        </div>
+
+        HTML.Include("/footer.fxp")
+      </div>
+    </fps>
+  </body>
+</html>

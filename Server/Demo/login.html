@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow"> 
+<title>NYCOW | Malas, Bolsas e Mochilas.</title>
+</head>
+<fps>
+  *--- User login
+  if type("HTTP.Request.Variables.User") = "O" && Login
+    *--- Create System Object
+    System = newobject("oSystem","main.prg")
+
+    if !empty(HTTP.Request.Variables.User.Value)
+      *--- Open database
+      open database ist
+
+      *--- Connect
+      if !System.Connect()
+        *--- Log
+        strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - accesserror.fpx - "+HTTP.Request.Variables.User.Value+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+        <script type="text/javascript">alert("Sistema indiponível, tente novamente mais tarde.");location.href="/"</script>
+
+        return
+      endif
+
+      *--- Open users table and locate user
+      SQLEmail = lower(padr(HTTP.Request.Variables.User.Value,60))
+      use "pessoa por email" alias pessoa
+
+      *--- Locate the user by password
+      locate for pe_senha == padr(HTTP.Request.Variables.Password.Value,15)
+
+      *--- Verify user password
+      if !eof()
+        *--- Define user
+        cUserName = pe_email
+        cCustomer = iif(isnull(cf_codigo),"",cf_codigo)
+        cSeller   = iif(isnull(fr_codigo),"",fr_codigo)
+
+        *--- Verify if user is valid
+        if empty(cCustomer) AND empty(cSeller)
+          *--- Log
+          strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - loginerror.fpx - "+HTTP.Request.Variables.User.Value+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+          <script type="text/javascript">alert("Usuário inválido.");location.href="/";</script>
+        endif
+
+        *--- Define session
+        cSession = substr(sys(2015),3)
+
+        *--- Set cookie
+        HTTP.SetCookie("SID",cSession,iif(type("HTTP.Request.Variables.Remember.Value") = "C" AND HTTP.Request.Variables.Remember.Value = "on",{^2030-01-01 00:00:00},{}))
+
+        *--- Add session ID to sessions
+        use data\sessions
+        append blank
+        replace session  with cSession
+        replace username with cUserName
+        replace customer with cCustomer
+        replace seller   with cSeller
+
+        *--- Log
+        strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - login.fpx - "+HTTP.Request.Variables.User.Value+":"+cCustomer+" - "+cSeller+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+        if empty(cSeller)
+          *--- Redirect to initial page
+          HTTP.Redirect("/client/")
+        else
+          *--- Redirect to initial page
+          HTTP.Redirect("/representante/")
+        endif
+      else
+        *--- Log
+        strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - loginerror.fpx - "+HTTP.Request.Variables.User.Value+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+        <script type="text/javascript">alert("Usuário e/ou senha inválidos.");location.href="/";</script>
+      endif
+
+      *--- Release System object
+      release System
+
+      *--- Release class
+      clear class main
+    else
+      *--- Log
+      strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - loginerror.fpx - "+HTTP.Request.Variables.User.Value+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+      <script type="text/javascript">alert("Usuário e/ou senha inválidos.");location.href="/"</script>
+    endif
+  endif
+</fps>

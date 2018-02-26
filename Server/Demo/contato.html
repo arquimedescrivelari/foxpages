@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta name="description" content="Indústria e Comércio de Bolsas e Mochilas. Conheça nossos produtos!">
+    <meta name="keywords" content="produto, bolsas, malas, mochilas, capas, notebook, nycow">
+    <meta name="robots" content="index, follow"> 
+    <meta content="pt-br" http-equiv="Content-Language">
+    <title>NYCOW | Malas, Bolsas e Mochilas.</title>
+    <link rel="stylesheet" href="index.css" type="text/css" />
+    <script type="text/javascript" src="/scripts/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/scripts/menu_jquery.js"></script>
+  </head>
+
+  <body>
+    <fps>
+      <div class="container">
+        HTML.Include("/header.fxp")
+
+        <div class="content">
+          <div class="subcontent">
+            <div class="contenttitlefull">
+              <div class="contenttitleback">
+                <div class="contenttype">Contato</div>
+              </div>
+            </div>
+            <div class="contenttext">
+              <p>Dê a sua opinião sobre o nosso site, nossos produtos, nossa organização ou sobre qualquer coisa que desejar. Seus comentários e sugestões são bem vindos. Caso haja a necessidade de uma visita comercial, nos envie seus dados e um de nossos representantes entrará em contato.</p>
+              <p>Caso seja um consumidor final e esteja com problemas, pedimos que leia a página de <a href="assistencia.fxp">Assistência Técnica</a>. Caso queira adquirir um de nossos produtos nos envie seus dados e lhe indicaremos a loja mais próxima de você.</p>
+
+              <div class="centerform">
+                <div class="contform">
+                  <form method="post" action="email.fxp">
+                    <div class="form"><span class="form-text">Empresa: </span><input class="form-input" style="width:78%;" name="empresa" type="text"></div>
+                    <div class="form"><span class="form-text">Contato: </span><input class="form-input" style="width:78%;" name="contato" type="text"></div>
+                    <div class="form"><span class="form-text">Cidade: </span><input class="form-input" name="cidade" type="text">
+                    <span class="form-text">Estado: </span><input class="form-input" style="width:5%;" name="estado" type="text"></div>
+                    <div class="form"><span class="form-text">Email: </span><input class="form-input" style="width:78%;" name="email" type="text"></div>
+                    <div class="form"><span class="form-text">Telefone: </span><input class="form-input" style="width:78%;" name="telefone" type="text"></div>
+                    <div class="form"><span class="form-text">Comentários: </span><textarea class="form-txtbox" name="comentarios"></textarea></div>
+                    <input class="form-button" style="margin-left: 18%;" type="submit" name="Submit" value="Enviar"><input class="form-button" type="reset" name="Reset" value="Limpar">
+                  </form>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        HTML.Include("/footer.fxp")
+      </div>
+    </fps>
+  </body>
+</html>

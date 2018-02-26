@@ -1,0 +1,122 @@
+<fps>
+  LOCAL lLogued
+
+  *--- Check user logued
+  if Request.Method = "GET" AND type("Request.Cookies.SID") = "O" AND !empty(Request.Cookies.SID.Value)
+    *--- Locate session
+    use data\sessions
+    locate for session = Request.Cookies.SID.Value
+
+    *--- User logued
+    if !eof()
+      lLogued = .T.
+      cUserName = sessions.username
+      cCustomer = sessions.customer
+    endif
+  endif
+
+  *--- If not logued redirect
+  if !lLogued
+    *--- User logued
+    HTTP.Redirect("/")
+    return
+  endif
+
+  <div class="itens">
+    <div class="itens-description">Item</div>
+    <div class="itens-quantity">Quantidade</div>
+    <div class="itens-price">Valor</div>
+    <div class="itens-total">Total</div>
+
+    *--- Open databases
+    open database icv
+    open database ifn
+
+    *--- Create System Object
+    System = newobject("oSystem","main.prg")
+
+    *--- Connect
+    System.Connect()
+
+    SQLCode = Request.Query_String
+    use "icv!pedido de venda" alias pedido in 0
+    use "icv!itens do pedido de venda" alias itens in 0
+    use "icv!nfes do pedido de venda" alias nfes in 0
+    use "ifn!boletos do pedido de venda" alias boletos nodata in 0
+
+    SQLCode = "PV"+pedido.pe_pedido
+    use "icv!itinerarios do pedido de venda" alias itinerarios in 0
+
+    select itens
+    scan
+      <div class="item">
+        <div class="item-description"><e>strconv(alltrim(pr_descr),9)</e></div>
+        <div class="item-quantity"><e>alltrim(transform(pi_quant,[@R 999,999,999.9]))</e> <e>alltrim(pr_unid)</e></div>
+        <div class="item-price"><e>alltrim(pi_moeda)</e> <e>alltrim(transform(pi_valor,[@R 999,999,999.99]))</e></div>
+        <div class="item-total"><e>alltrim(pi_moeda)</e> <e>alltrim(transform(pi_valort,[@R 999,999,999.99]))</e></div>
+      </div>
+    endscan
+  </div>
+  <div class="totals">
+    select pedido
+    <div class="totals-total">Sub-total</div><div class="totals-totalvalue">R$ <e>alltrim(transform(pe_valor,[@R 999,999,999.99]))</e></div>
+    <div class="totals-subtotal">Acréscimo</div><div class="totals-subtotalvalue">R$ <e>alltrim(transform(pe_acres,[@R 999,999,999.99]))</e></div>
+    <div class="totals-subtotal">Desconto</div><div class="totals-subtotalvalue">R$ <e>alltrim(transform(pe_desc,[@R 999,999,999.99]))</e></div>
+    <div class="totals-total">Total</div><div class="totals-totalvalue">R$ <e>alltrim(transform(pe_valort,[@R 999,999,999.99]))</e></div>
+  </div>
+  <div class="tracking">
+    <div class="tracker">Acompanhe seu pedido
+      <div class="tracker-section">
+        <div class="tracker-subsection" style="color:#008000">Registrado<br><e>pedido.pe_data</e></div>
+        if pedido.pe_situac = 1 OR pedido.pe_situac = 5 OR pedido.pe_situac = 8
+           <div class="tracker-subsection">Aprovado</div>
+        else
+           <div class="tracker-subsection" style="color:#008000">Aprovado<br><e>pedido.pe_ap_data</e></div>
+        endif
+        if eof("nfes") AND eof("itinerarios")
+          <div class="tracker-subsection">Faturado</div>
+        else
+          <div class="tracker-subsection" style="color:#008000">Faturado<br><e>nfes.ft_data</e></div>
+        endif
+        if eof("itinerarios")
+          <div class="tracker-subsection">Entregando</div>
+          <div class="tracker-subsection">Entregue</div>
+        else
+          <div class="tracker-subsection" style="color:#008000">Entregando<br><e>itinerarios.it_data</e></div>
+          if itinerarios.it_situac = 2
+            <div class="tracker-subsection" style="color:#008000">Entregue<br><e>itinerarios.it_data</e></div>
+          else
+            <div class="tracker-subsection">Entregue</div>
+          endif
+        endif
+      </div>
+    </div>
+  </div>
+  <div class="downloads">
+    <div class="downloads-subtitle">Downloads</div>
+    <div class="downloads-download">Pedido (PDF)</div>
+
+    select nfes
+    scan
+      <div class="downloads-download">NFe<e>ft_nfe_id</e> (XML)
+
+      SQLCode = "FT"+ft_fatura
+      select boletos
+      requery()
+
+      if !eof()
+        \\ - Boletos
+        scan
+          <e>substr(ti_contr,3,7)</e><e>chr(64+val(ti_parc))</e> 
+        endscan
+      endif
+      </div>
+    endscan
+  </div>
+
+  *--- Release System object
+  release System
+
+  *--- Release class
+  clear class main
+</fps>

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta name="description" content="Indústria e Comércio de Bolsas e Mochilas. Conheça nossos produtos!">
+    <meta name="keywords" content="produto, bolsas, malas, mochilas, capas, notebook, nycow">
+    <meta name="robots" content="index, follow"> 
+    <meta content="pt-br" http-equiv="Content-Language">
+    <title>NYCOW | Malas, Bolas e Mochilas.</title>
+    <link rel="stylesheet" href="/index.css" type="text/css" />
+    <script type="text/javascript" src="/scripts/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/scripts/menu_jquery.js"></script>
+    <script type="text/javascript" src="/scripts/jquery.jqzoom-core.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('.jqzoom').jqzoom({
+          zoomType: 'innerzoom',
+          preloadImages: false,
+          alwaysOn:false
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <fps>
+      <div class="container">
+        HTML.Include("/header.html")
+
+        strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - details.fpx"+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+        use products\products
+        locate for codigo = Request.Query_String
+
+        <div class="content">
+          <div class="subcontent">
+            <div class="contentitle"><e>grupo</e> > <e>codigo</e></div>
+            <div class="clearfix">
+              <div  class="clearfix">
+                nFiles = adir(aFile,HTML.Directory+"pics/products/"+alltrim(codigo)+"_??c.jpg")
+                if nFiles > 0
+                  <a href="/pics/products/<e>strtran(lower(aFile[1,1]),'c.jpg','g.jpg')</e>" class="jqzoom" rel='gal1' title="<e>codigo</e>" >
+                    <img src="/pics/products/<e>strtran(lower(aFile[1,1]),'c.jpg','m.jpg')</e>" title="<e>codigo</e>" style="border: 3px solid #bbbbbb;">
+                  </a>
+                  <ul id="thumblist">
+                    <li><a class="zoomThumbActive" rel="{gallery: 'gal1', smallimage: '/pics/products/<e>strtran(lower(aFile[1,1]),"c.jpg","m.jpg")</e>',largeimage: '/pics/products/<e>strtran(lower(aFile[1,1]),"c.jpg","g.jpg")</e>'}"><img src='/pics/products/<e>lower(aFile[1,1])</e>'></a></li>
+                    for nFile = 2 to nFiles
+                      <li><a rel="{gallery: 'gal1', smallimage: '/pics/products/<e>strtran(lower(aFile[nFile,1]),"c.jpg","m.jpg")</e>',largeimage: '/pics/products/<e>strtran(lower(aFile[nFile,1]),"c.jpg","g.jpg")</e>'}"><img src='/pics/products/<e>lower(aFile[nFile,1])</e>'></a></li>
+                    next
+                  </ul>
+                endif
+              </div>
+            </div>
+            <div class="contentdata">
+              <e>caracteris</e>
+            </div>
+           </div>
+        </div>
+
+        HTML.Include("/footer.fxp")
+      </div>
+    </fps>
+  </body>
+</html>

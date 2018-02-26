@@ -1,0 +1,57 @@
+<fps>
+  *--- Open database
+  open database dst
+
+  *--- Create System Object
+  System = newobject("oSystem","main.prg")
+
+  *--- Connect
+  System.Connect()
+
+  *--- Open users table and locate user
+  SQLCode   = Request.Query_String
+  SQLSearch = "NINFORM"
+  use "cliente" alias cliente
+
+  <h2><e>strconv(alltrim(cliente.pe_nome),9)</e></h2>
+  <hr />
+  <table id="contactDetail" cellpadding="4" cellspacing="4">
+    <colgroup>
+      <col width="140" />
+      <col />
+    </colgroup>
+    <tbody>
+      <tr>
+        <th>Endereço</th>
+        <td><e>strconv(alltrim(cliente.ed_lograd),9)+[, ]+strconv(alltrim(cliente.ed_numero),9)+iif(!empty(cliente.ed_compl),[ - ]+strconv(alltrim(ed_compl),9),[])</e></td>
+      </tr>
+      <tr>
+        <th>Bairro</th>
+        <td><e>strconv(alltrim(cliente.ed_bairro),9)</e></td>
+      </tr>
+      <tr>
+        <th>Cidade</th>
+        <td><e>strconv(alltrim(cliente.ed_cidade),9)</e></td>
+      </tr>
+      <tr>
+        <th>Estado</th>
+        <td><e>alltrim(cliente.es_sigla)</e></td>
+        <th>CEP</th>
+        <td><e>transform(cliente.ed_cep,"@R 99999-999")</e></td>
+      </tr>
+      if !empty(cliente.ed_tel_loc)
+        <tr>
+          <th>Telefone</th>
+          <td><e>strconv(alltrim(cliente.ed_tel_loc),9)</e></td>
+        </tr>
+      endif
+    </tbody>
+  </table>
+  <hr />
+
+  *--- Release System object
+  release System
+
+  *--- Release class
+  clear class main
+</fps>

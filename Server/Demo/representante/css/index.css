@@ -1,0 +1,201 @@
+body, html {
+	width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+}
+
+#borderContainer {
+	width: 100%; height: 100%;
+}
+
+#topBar {
+	margin: 0; padding: 0; border: none;
+}
+
+h1 {
+	margin: 0; padding: 10px; background-color: #003267; color: #fff;
+}
+
+#mainSection {
+	margin: 0; padding: 0; background-color: #eee;
+}
+
+#treeSection {
+	width: 160px;
+}
+
+#mainContainer {
+	padding: 0;
+}
+
+#gridSection {
+	height: 160px; padding: 0;
+}
+
+.header-logo {
+	background:url(/pics/logo.jpg);
+	height:49px;
+	width:352px;
+}
+
+#clientsGrid td {
+  	border-style:none !important;
+}
+
+#clientsGrid.dojoxGridCellFocus {
+   	border: none !important;
+}
+
+#ordersGrid td {
+  	border-style:none !important;
+}
+
+#ordersGrid.dojoxGridCellFocus {
+   	border: none !important;
+}
+
+.dojoxGrid table {
+	margin: 0;
+}
+
+.claro .dojoxGrid {
+   	border: none !important;
+}
+.claro .dojoxGridHeader .dojoxGridCellFocus {
+   	border: 1px solid #b5bccc7 !important;
+}
+
+/*.claro .dojoxGridCellFocus {
+   	border: none !important;
+}*/
+
+.listingarea .dojoxGridCellFocus .dojoxGridCellOver {
+   	border:none !important;
+}
+
+.listingarea .dojoxGridRowOver{
+   	border-bottom-color: transparent !important;
+  	border-top-color: transparent !important;
+}
+
+.listingarea .dojoxGridRowOver .dojoxGridCell {
+   	background-color: inherit;
+   	color:inherit;
+}
+
+span.dojoxGridNoData {
+	color: red;
+}
+
+h2 {
+	font-size: 2.2em;
+	margin: 0; padding: 0;
+}
+
+#contactView {
+
+}
+
+#contactDetail th {
+	text-align: left;
+	color: #888;
+}
+
+.claro {
+    color: #131313;
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+    font-size: 0.688em;
+}
+
+.edgePanel {
+    background-color: #d0e9fc;
+}
+
+:focus { outline: none; }
+
+.pageOverlay {
+    top: 0;
+    left: 0;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1001;
+    display: block;
+}
+
+#loadingOverlay {
+    background:  #fff url('//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/images/loadingAnimation.gif') no-repeat 10px 23px;
+}
+
+#loadingOverlay .loadingMessage {
+    padding: 25px 40px;
+    color: #999;
+}
+
+.row { 
+	margin-bottom:1em;
+}
+
+.center-row { 
+	text-align:center;
+}
+
+.caption04 {
+	 display:inline-block;
+	 margin-right:1em;
+	 text-align:right;
+	 width:4em;
+}
+
+.caption06 {
+	 display:inline-block;
+	 margin-right:1em;
+	 text-align:right;
+	 width:6em;
+}
+
+.caption08 {
+	 display:inline-block;
+	 margin-right:1em;
+	 text-align:right;
+	 width:8em;
+}
+
+.caption10 {
+	 display:inline-block;
+	 margin-right:1em;
+	 text-align:right;
+	 width:10em;
+}
+
+.caption12 {
+	 display:inline-block;
+	 margin-right:1em;
+	 text-align:right;
+	 width:12em;
+}
+
+.caption99 {
+	 display:inline-block;
+}
+
+#edit_client_pe_nome {text-transform: uppercase;}
+#edit_client_pe_email {text-transform: lowercase;}
+#edit_client_pe_rg_num {text-transform: uppercase;}
+#edit_client_pe_rg_emi {text-transform: uppercase;}
+#edit_client_pe_psp_num {text-transform: uppercase;}
+#edit_client_pe_im {text-transform: uppercase;}
+#edit_client_cf_contato {text-transform: uppercase;}
+#edit_client_ed_lograd {text-transform: uppercase;}
+#edit_client_ed_numero {text-transform: uppercase;}
+#edit_client_ed_compl {text-transform: uppercase;}
+#edit_client_ed_bairro {text-transform: uppercase;}
+#edit_client_ed_cidade {text-transform: uppercase;}
+#edit_client_ee_lograd {text-transform: uppercase;}
+#edit_client_ee_numero {text-transform: uppercase;}
+#edit_client_ee_compl {text-transform: uppercase;}
+#edit_client_ee_bairro {text-transform: uppercase;}
+#edit_client_ee_cidade {text-transform: uppercase;}
+#edit_client_ec_lograd {text-transform: uppercase;}
+#edit_client_ec_numero {text-transform: uppercase;}
+#edit_client_ec_compl {text-transform: uppercase;}
+#edit_client_ec_bairro {text-transform: uppercase;}
+#edit_client_ec_cidade {text-transform: uppercase;}

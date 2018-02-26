@@ -1,0 +1,98 @@
+<fps>
+  <div class="header">
+    <a class="header-logo" href="/"></a>
+    LOCAL lLogued
+
+    *--- Check user logued
+    if Request.Method = "GET" AND type("Request.Cookies.SID") = "O" AND !empty(Request.Cookies.SID.Value)
+      *--- Locate session
+      use data\sessions
+      locate for session = Request.Cookies.SID.Value
+
+      *--- User logued
+      if !eof()
+        lLogued = .T.
+        cUserName = sessions.username
+        cSeller   = sessions.seller
+      endif
+
+      *--- Close sessions tables
+      use
+    endif
+
+    *--- Don't store in cache
+    Response.Pragma = "no-cache"
+    Response.Cache_Control = "no-cache, no-store, max-age=0"
+
+    *--- If not logued show login
+    if !lLogued
+      <div class="login">
+        <form action="/login.fxp" method="post">
+          <div class="login-text">Usuário</div>
+          <input class="login-input" name="user" type="text" value="<<iif(type('Request.Variables.User.Value') = 'C',Request.Variables.User.Value,'')>>" placeholder="Digite seu email"/>
+          <div class="login-text">Senha</div>
+          <input class="login-input" name="password" type="password" placeholder="Digite sua senha"/>
+          <input class="login-check" type="checkbox" name="remember"><span class="login-text">Mantenha-me conectado</span>
+          <input class="login-button" type="submit" Value="Entrar">
+        </form>
+      </div>
+    else
+      <div class="logout">
+        <form action="/logout.fxp" method="post">
+          <input class="logout-button" type="submit" Value="Sair">
+          <div class="logout-text"><e>cUserName</e></div>
+        </form>
+      </div>
+    endif
+  </div>
+  <div class="header-menu">
+    <div id="cssmenu">
+      <ul>
+        if lLogued
+          <li class="active"><a href="<e>iif(empty(cSeller),'/client/','/representante/')</e>"><span><e>iif(empty(cSeller),"Cliente","Representante")</e></span></a></li>
+        endif
+        <li><a href="/empresa.fxp"><span>Empresa</span></a></li>
+        <li class="has-sub"><a><span>Produtos</span></a>
+          use products\products
+
+          cGrupo = ""
+          cLinha = ""
+
+          <ul>
+          scan
+            if cGrupo # grupo
+              cGrupo = grupo
+              <li class="has-sub"><a href="/products/group.fxp?<e>alltrim(grupo)</e>"><span><e>alltrim(grupo)</e></span></a>
+              <ul>
+            endif
+
+            if cLinha # linha
+              cLinha = linha
+              skip 
+              if cLinha = linha
+                skip -1
+                <li><a href="/products/group.fxp?<e>alltrim(grupo)</e>#<e>alltrim(linha)</e>"><span><e>alltrim(linha)</e></span></a></li>
+              else
+                skip -1
+                <li class="last"><a href="/products/group.fxp?<e>alltrim(grupo)</e>#<e>alltrim(linha)</e>"><span><e>alltrim(linha)</e></span></a></li>
+              endif
+            endif
+
+            skip
+            if cGrupo # grupo
+              skip -1
+              </ul>
+              </li>
+            else
+              skip -1
+            endif
+          endscan
+          </ul>
+        </li>
+        <li><a href="/assistencia.fxp"><span>Assistência Técnica</span></a></li>
+        <li><a href="/catalogo.pdf"><span>Catálogo</span></a></li>
+        <li class="last"><a href="/contato.fxp"><span>Contato</span></a></li>
+      </ul>
+    </div>
+  </div>
+</fps>

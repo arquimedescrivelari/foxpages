@@ -1,0 +1,99 @@
+<fps>
+LOCAL lLogued
+
+*--- Check user logued
+if Request.Method = "GET" AND type("Request.Cookies.SID") = "O" AND !empty(Request.Cookies.SID.Value)
+  *--- Locate session
+  use data\sessions
+  locate for session = Request.Cookies.SID.Value
+
+  *--- User logued
+  if !eof()
+    lLogued = .T.
+    cUserName = sessions.username
+	cCustomer = sessions.customer
+  endif
+
+  *--- Close sessions table
+  use
+endif
+
+*--- If not logued redirect
+if !lLogued
+  *--- User logued
+  HTTP.Redirect("/")
+  return
+endif
+</fps>
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store" >
+    <meta http-equiv="Pragma" content="no-cache, no-store" >
+    <meta http-equiv="Expires" content="Mon, 06 Jan 1990 00:00:01 GMT">
+    <title>NYCOW | Malas, Bolsas e Mochilas.</title>
+    <script type="text/javascript" src="/scripts/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/scripts/menu_jquery.js"></script>
+    <link rel="stylesheet" href="/index.css" type="text/css" />
+  </head>
+  <body>
+    <fps>
+      <div class="container">
+        HTML.Include("/header.fxp")
+
+        *--- Log
+        strtofile(ttoc(datetime())+" - "+Request.Remote_Address+":"+Request.Remote_Port+" - lastbank.fpx - "+cCustomer+chr(13)+chr(10),HTML.Directory+"visits.txt",1)
+
+        *--- Open database
+        open database ifn
+
+        *--- Create System Object
+        System = newobject("oSystem","main.prg")
+
+        *--- Connect
+        System.Connect()
+
+        <div class="content">
+          <div class="subcontent">
+            <div class="banks">
+              <div class="banks-title">Boletos em aberto</div>
+              <div class="banks-subtitle">Documento</div>
+              <div class="banks-subtitle">Vencimento</div>
+              <div class="banks-subtitle">Valor</div>
+              <div class="banks-subtitle">Situação</div>
+
+              SQLClifor = cCustomer
+              use "ultimos boletos" alias boletos
+
+              scan
+                if bo_pg_st # 1
+                  loop
+                endif
+
+                <div class="bank">
+                  <div class="bank-number"><e>iif("FT0" $ ti_contr,"0"+substr(ti_contr,3,7),alltrim(ti_contr))+"-"+chr(64+val(ti_parc))</e></div>
+                  <div class="bank-date"><e>bo_vcto</e></div>
+                  <div class="bank-total">R$ <e>alltrim(transform(bo_valor,[@R 999,999,999.99]))</e></div>
+                  if bo_pg_st = 1
+                    <div class="bank-situation">EM ABERTO</div>
+                  else
+                    <div class="bank-situation">PAGO</div>
+                  endif
+                </div>
+              endscan
+            </div>
+          </div>
+        </div>
+
+        HTML.Include("/footer.fxp")
+      </div>
+
+      *--- Release System object
+      release System
+
+      *--- Release class
+      clear class main
+    </fps>
+  </body>
+</html>
