@@ -133,10 +133,6 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 
 		do case
 		case This.Type = "HTTP" OR This.Type = "FCGI"
-			*--- Update ThreadState to in use
-			This.CallBack.ThreadState = 2
-			This.CallBack.LastUse = datetime()
-
 			do case
 			case This.Type = "HTTP" && Hypertext Transport Protocol
 				*--- Incomplete request
@@ -189,6 +185,10 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 				m.lcURI    = substr(This.Receiving,at("DOCUMENT_URI",This.Receiving)+12,ctobin(chr(0)+substr(This.Receiving,at("DOCUMENT_URI",This.Receiving)-1,1),"S"))
 			endcase
 			
+			*--- Update ThreadState to in use
+			This.CallBack.ThreadState = 2
+			This.CallBack.LastUse = datetime()
+
 			*--- Open gateways table
 			if !used("gateways")
 				use data\gateways in 0
