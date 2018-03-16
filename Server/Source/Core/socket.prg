@@ -131,7 +131,7 @@ DEFINE CLASS Socket AS CUSTOM
 			sleep(10)
 		enddo
 
-		return This.SocketWrench.Write(Data) # -1
+		return This.SocketWrench.Write(createbinary(Data)) # -1
 	ENDPROC
 
 	PROCEDURE OnAccept(Handle)
