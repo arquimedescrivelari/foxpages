@@ -658,7 +658,7 @@ DEFINE CLASS SMTP AS Base OLEPUBLIC
 		This.ReceivedData = ""
 		
 		*--- Write data to socket
-		return This.Socket.Write(Data)
+		return This.Socket.Write(createbinary(Data))
 	ENDPROC
 
 	HIDDEN PROCEDURE Rand()
@@ -1269,7 +1269,7 @@ DEFINE CLASS HTTP AS Base OLEPUBLIC
 
 	HIDDEN PROCEDURE Write(Data AS Character) AS Boolean
 		*--- Write socket
-		return This.Socket.Write(Data)
+		return This.Socket.Write(createbinary(Data))
 	ENDPROC
 
 	HIDDEN PROCEDURE GetCookies(Data AS String)
@@ -2028,7 +2028,7 @@ DEFINE CLASS Socket AS CUSTOM
 		if This.LogLevel > 1
 			strtofile("Socket.Write()"+iif(This.LogLevel > 2,CRLF+Data,""),This.LogFile,1)
 		endif
-		return This.SocketWrench.Write(Data) # -1
+		return This.SocketWrench.Write(createbinary(Data)) # -1
 	ENDPROC
 
 	PROCEDURE Read()
