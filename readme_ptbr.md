@@ -128,7 +128,7 @@ O Fox Pages Server torna possível o desenvolvimento destas páginas utilizando os
 
 No Fox Pages Server uma pagina HTML é convertida em um arquivo de programa PRG e compilada para um arquivo compilado FXP, assim o processamento das paginas é extremamente rápido e não tem as limitações do uso de outro interpretador.
 
-No processo de compilação apenas o código entre as tag <FPS> e </FPS> serão processados, o restante é enviado como conteúdo estático.
+No processo de compilação apenas o código entre as tag `<FPS>` e `</FPS>` serão processados, o restante é enviado como conteúdo estático.
 
 Um exemplo de conteúdo estático.
 ```
@@ -138,9 +138,9 @@ Olá mundo
 ```
 Resultado:
 
-Olá mundo
+Olá mundo  
 
-Um exemplo de um programa como conteúdo estático por falta das tags <FPS> e </FPS>.
+Um exemplo de um programa como conteúdo estático por falta das tags `<FPS>` e `</FPS>`.
 ```
 <HTML>
 for nCounter = 1 to 3
@@ -150,11 +150,11 @@ next
 ```
 Resultado:
 
-for lnCounter = 1 to 3
-   Olá mundo
-next
+for lnCounter = 1 to 3  
+   Olá mundo  
+next  
 
-Um exemplo usando as tags <t> e <e>, elas são reponsáveis pelo envio de textos estáticos e expressões.
+Um exemplo usando as tags `<t>` e `<e>`, elas são reponsáveis pelo envio de textos estáticos e expressões.
 ```
 <HTML>
    <FPS>
@@ -167,12 +167,12 @@ Um exemplo usando as tags <t> e <e>, elas são reponsáveis pelo envio de textos e
 ```
 Resultado:
 
-Olá mundo
-Olá mundo
-Olá mundo
+Olá mundo  
+Olá mundo  
+Olá mundo  
 
 Um exemplo usando outras tags HTML combinadas a programação.
-Toda linha iniciada com uma tag HTML ou pela tag <t> é enviada.
+Toda linha iniciada com uma tag HTML ou pela tag `<t>` é enviada.
 ```
 <HTML>
    <FPS>
@@ -190,13 +190,13 @@ Toda linha iniciada com uma tag HTML ou pela tag <t> é enviada.
 ```
 Resultado:
 
-Começo
+Começo  
 
-Ola mundo
-Ola mundo
-Ola mundo
+Ola mundo  
+Ola mundo  
+Ola mundo  
 
-Fim
+Fim  
 
 ## Aplicações RESTfull
 REST (Representational State Transfer) é um estilo arquitetônico que defende que os aplicativos da Web devem usar o HTTP como era originalmente previsto, onde as requisições GET, PUT, POST e DELETE devem ser usados para consulta, alteração, criação e exclusão, respectivamente.
@@ -223,27 +223,27 @@ Para usar a versão comercial do SocketWrench é necessário comprar uma licença, p
 
 A configuração versão utilizada, gratuita ou comercial, ou a versão do SocketWrench, está localizada no arquivo FOXPAGES.H da pasta CORE, como segue abaixo:
 
-//SOCKETWRENCH
-#DEFINE USEFREEVERSION
-#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.6"
+//SOCKETWRENCH  
+#DEFINE USEFREEVERSION  
+#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.6"  
 
-//SocketWrench 8
-//#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.8"
-//#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"
+//SocketWrench 8  
+//#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.8"  
+//#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"  
 
-//SocketWrench 9
-//#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.9"
-//#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"
+//SocketWrench 9  
+//#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.9"  
+//#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"  
 
 É necessário recompilar o projeto após alterar estas configurações.
 
 ## Créditos
 
-Multithreading - VFP2C32T.FLL - Christian Ehlscheid
-Compactação - VFPCompression - Craig Boyd
-Encriptação - VFPEncryption - Craig Boyd
-JSON Parser - Versão modificada da biblioteca - Craig Boyd
-Sockets - Socketwrench - Catalyst Development
+Multithreading - VFP2C32T.FLL - Christian Ehlscheid  
+Compactação - VFPCompression - Craig Boyd  
+Encriptação - VFPEncryption - Craig Boyd  
+JSON Parser - Versão modificada da biblioteca - Craig Boyd  
+Sockets - Socketwrench - Catalyst Development  
 
 ## Doação
 Se este projeto é útil para você, cosidere uma doação.

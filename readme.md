@@ -126,7 +126,7 @@ The Fox Server Pages makes it possible to develop these pages using the resource
 
 In Fox Pages Server an HTML page is converted into a PRG program file and compiled into a compiled FXP file, so page processing is extremely fast and does not have the limitations of using another interpreter.
 
-In the compilation process only the code between the <FPS> and </ FPS> tags will be processed, the rest will be sent as static content.
+In the compilation process only the code between the `<FPS>` and `</FPS>` tags will be processed, the rest will be sent as static content.
 
 An example of static content.
 ```
@@ -136,9 +136,9 @@ Hello World
 ```
 Result:
 
-Hello World
+Hello World  
 
-An example of a program as static content because of the missing <FPS> and </ FPS> tags.
+An example of a program as static content because of the missing `<FPS>` and `</FPS>` tags.
 ```
 <HTML>
 for nCounter = 1 to 3
@@ -148,11 +148,11 @@ next
 ```
 Result:
 
-for lnCounter = 1 to 3
-    Hello World
-next
+for lnCounter = 1 to 3  
+    Hello World  
+next  
 
-An example using the tags <t> and <and>, they are responsible for sending static texts and expressions.
+An example using the tags `<t>` and `<e>`, they are responsible for sending static texts and expressions.
 ```
 <HTML>
     <FPS>
@@ -165,12 +165,12 @@ An example using the tags <t> and <and>, they are responsible for sending static
 ```
 Result:
 
-Hello World
-Hello World
-Hello World
+Hello World  
+Hello World  
+Hello World  
 
 An example using other HTML tags combined programming.
-Every line started with an HTML tag or by the <t> tag is sent.
+Every line started with an HTML tag or by the `<t>` tag is sent.
 ```
 <HTML>
     <FPS>
@@ -188,18 +188,18 @@ Every line started with an HTML tag or by the <t> tag is sent.
 ```
 Result:
 
-Begin
+Begin  
 
-Hello World
-Hello World
-Hello World
+Hello World  
+Hello World  
+Hello World  
 
-End
+End  
 
 ## RESTfull Applications
 REST (Representational State Transfer) is an architectural style that advocates that Web applications should use HTTP as originally intended, where GET, PUT, POST and DELETE requests should be used for query, change, creation, and deletion, respectively.
 
-Fox Pages Server processes a request as REST whenever the Accept header is "application / json".
+Fox Pages Server processes a request as REST whenever the Accept header is "application/json".
 
 More details can be found in the application available on the demo site when signing in with the representative account.
 
@@ -221,27 +221,27 @@ To use the commercial version of SocketWrench you must purchase a license, as Fo
 
 The version configuration used, free or commercial, or the version of SocketWrench, is located in the FOXPAGES.H file of the CORE folder, as follows:
 
-//SOCKETWRENCH
-#DEFINE USEFREEVERSION
-#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.6"
+//SOCKETWRENCH  
+#DEFINE USEFREEVERSION  
+#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.6"  
 
-//SocketWrench 8
-//#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.8"
-//#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"
+//SocketWrench 8  
+//#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.8"  
+//#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"  
 
-//SocketWrench 9
-//#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.9"
-//#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"
+//SocketWrench 9  
+//#DEFINE CSWSOCK_CONTROL		"SocketTools.SocketWrench.9"  
+//#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"  
 
 You need to recompile the project after you change these settings.
 
 ## Credits
 
-Multithreading - VFP2C32T.FLL - Christian Ehlscheid
-Compression - VFPCompression - Craig Boyd
-Encryption - VFPEncryption - Craig Boyd
-JSON Parser - Modified library version - Craig Boyd
-Sockets - Socketwrench - Catalyst Development
+Multithreading - VFP2C32T.FLL - Christian Ehlscheid  
+Compression - VFPCompression - Craig Boyd  
+Encryption - VFPEncryption - Craig Boyd  
+JSON Parser - Modified library version - Craig Boyd  
+Sockets - Socketwrench - Catalyst Development  
 
 ## Donate
 If this project is usefull to you, consider a donation.
