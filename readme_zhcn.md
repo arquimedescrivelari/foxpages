@@ -168,9 +168,9 @@ next
 ```
 结果：
 
-Hello World
-Hello World
-Hello World
+Hello World  
+Hello World  
+Hello World  
 
 使用其他 HTML 标记组合编程的示例。每行都以 HTML 标记开始, 或由标记发送。
 ```
