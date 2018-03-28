@@ -126,9 +126,9 @@ Fox Server Pages 使开发这些网页成为可能, 利用静态页面的资源 
 
 在 Fox Pages Server 中 HTML 页被转换为 PRG 程序文件并编译为 FXP 文件, 因此页面处理速度非常快, 并且没有使用其他解释器的限制。
 
-In the compilation process only the code between the `<FPS>` and `</FPS>` tags will be processed, the rest will be sent as static content.
+在编译过程中，只处理`<FPS>`和`</FPS>`标记之间的代码，其余部分将作为静态内容发送。
 
-An example of static content.
+静态内容的一个例子。
 在编译过程中, 只有在`<FPS>`和`</FPS>`之间的代码被处理, 其余部分将作为静态内容发送。
 
 静态内容的示例.

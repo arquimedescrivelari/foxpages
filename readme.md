@@ -15,7 +15,7 @@ Microsoft Visual FoxPro 9.0
 Fox Pages Server is distributed in two modes: development mode and distribution mode.
 
 ### Development Mode
-In this mode, the server works by default in singlethread, so that it is possible to use Visual FoxPro for the development of FXP pages. The mode of development requires Visual FoxPro installed.
+In this mode, the server works by default in singlethread, so that it is possible to use Visual FoxPro for the development of FXP pages. The development mode requires Visual FoxPro installed.
 
 ### Distribution mode
 In this mode, the server works in multithread, providing extreme processing gain. The distribution mode requires the Visual FoxPro runtime installed.
@@ -213,7 +213,7 @@ Fox Pages Server is free and open source software. The license is located in the
 
 The component used for the connections is the Socketwrench of the company Catalyst Development Corporation (www.sockettools.com).
 
-This component is distributed in the free and commercial versions. The free version does not support secure connections (SSL / TLS).
+This component is distributed in the free and commercial versions. The free version does not support secure connections (SSL/TLS).
 
 The development version of Fox Pages Server is configured to use the free version of SocketWrench. This will be a limitation only if the use of secure connections in the development environment is required.
 
