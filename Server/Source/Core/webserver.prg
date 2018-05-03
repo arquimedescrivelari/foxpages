@@ -158,7 +158,7 @@ DEFINE CLASS WebServer AS CUSTOM
 		endif
 
 		do case
-		case "application/json" $ This.Request.Accept && REST Request
+		case "application/json" $ This.Request.Accept AND justext(This.Request.Document_URI) # "json" && REST Request
 			*--- Requested method
 			if !inlist(This.Request.Method,"GET","POST","PUT","DELETE","HEAD","OPTIONS")
 			    This.SendError("501","Not implemented","Not implemented","Opss... This method is not implemented...")
