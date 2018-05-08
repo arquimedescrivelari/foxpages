@@ -1,5 +1,9 @@
 # Fox Pages Server 3.0
 
+![PTBR](http://flags.fmcdn.net/data/flags/h80/br.png)<br>[PortuguÃªs](readme_ptbr.md)
+
+![ZNCH](http://flags.fmcdn.net/data/flags/h80/cn.png)<br>[Chinese](readme_zhcn.md)
+
 ## What is this?
 
 Fox Pages Server (FPS) is a multithreaded HTTP, HTTPS, and FastCGI server for Visual FoxPro.
@@ -142,25 +146,25 @@ An example of a program as static content because of the missing `<FPS>` and `</
 ```
 <HTML>
 for nCounter = 1 to 3
-    Hello World
+Â Â Â  Hello World
 next
 </HTML>
 ```
 Result:
 
 for lnCounter = 1 to 3  
-    Hello World  
+Â Â Â  Hello World  
 next  
 
 An example using the tags `<t>` and `<e>`, they are responsible for sending static texts and expressions.
 ```
 <HTML>
-    <FPS>
-       cWorld = "World"
-       for nCounter = 1 to 3
-          <t>Hello </t><e>cWorld</e><br>
-       next
-    </FPS>
+Â Â Â  <FPS>
+Â Â Â Â Â Â  cWorld = "World"
+Â Â Â Â Â Â  for nCounter = 1 to 3
+Â Â Â Â Â Â Â Â Â  <t>Hello </t><e>cWorld</e><br>
+Â Â Â Â Â Â  next
+Â Â Â  </FPS>
 </HTML>
 ```
 Result:
@@ -173,17 +177,17 @@ An example using other HTML tags combined programming.
 Every line started with an HTML tag or by the `<t>` tag is sent.
 ```
 <HTML>
-    <FPS>
-       <b>Begin</b><br><br>
+Â Â Â  <FPS>
+Â Â Â Â Â Â  <b>Begin</b><br><br>
 
-       cWorld = "World"
-       for nCounter = 1 to 3
-          <b><t>Hello </t><e>cWorld</e></b><br>
-       next
+Â Â Â Â Â Â  cWorld = "World"
+Â Â Â Â Â Â  for nCounter = 1 to 3
+Â Â Â Â Â Â Â Â Â  <b><t>Hello </t><e>cWorld</e></b><br>
+Â Â Â Â Â Â  next
 
        <br>
        <t>End</t>
-    </FPS>
+Â Â Â  </FPS>
 </HTML>
 ```
 Result:
