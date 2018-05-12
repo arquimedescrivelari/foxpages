@@ -1,8 +1,8 @@
 # Fox Pages Server 3.0
 
-![PTBR](http://flags.fmcdn.net/data/flags/h80/br.png)<br>[Português](readme_ptbr.md)
+[![PTBR](http://flags.fmcdn.net/data/flags/h80/br.png)<br>Português](readme_ptbr.md)
 
-![ZNCH](http://flags.fmcdn.net/data/flags/h80/cn.png)<br>[Chinese](readme_zhcn.md)
+[![ZNCH](http://flags.fmcdn.net/data/flags/h80/cn.png)<br>Chinese](readme_zhcn.md)
 
 ## What is this?
 
