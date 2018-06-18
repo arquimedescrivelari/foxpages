@@ -158,7 +158,9 @@ DEFINE CLASS WebServer AS CUSTOM
 		endif
 
 		do case
-		case "application/json" $ This.Request.Accept AND justext(This.Request.Document_URI) # "json" && REST Request
+		case This.Request.X_Requested_With = "XMLHttpRequest" AND ; && REST Request
+			 (("application/json" $ This.Request.Accept AND justext(This.Request.Document_URI) # "json") OR ; 
+			 ("application/xml" $ This.Request.Accept AND justext(This.Request.Document_URI) # "xml"))
 			*--- Requested method
 			if !inlist(This.Request.Method,"GET","POST","PUT","DELETE","HEAD","OPTIONS")
 			    This.SendError("501","Not implemented","Not implemented","Opss... This method is not implemented...")
@@ -821,6 +823,7 @@ DEFINE CLASS Request AS CUSTOM
 	Server_Software			= ""
 	Type					= 0
 	User_Agent				= ""
+	X_Requested_With        = ""
 
 	*--- Resquest objects
 	ADD OBJECT Cookies   AS Cookies && Cookies container object
