@@ -5,7 +5,8 @@
 **************
 DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 	*--- Properties
-	Bandwidth			= 0	
+	Bandwidth			= 0
+	Buffer				= ""
 	CallBack			= NULL
 	CertificateName		= ""
 	CertificateStore	= ""
@@ -19,7 +20,6 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 	Type				= ""
 	Queued				= .F.
 	Password            = ""
-	Receiving			= ""
 	Compression         = 0
 	RemoteHost			= ""
 	RemotePort			= 0
@@ -57,8 +57,6 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 	ENDPROC
 
 	HIDDEN PROCEDURE Destroy()
-		*--- Debug log
-*		This.Log.Add(1,"Destroy")
 	ENDPROC
 
 	PROCEDURE Error(nError,cMethod,nLine)
@@ -68,7 +66,7 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 	PROCEDURE Accept(Handle AS Integer)
 	LOCAL lnReturn
 		*--- Clear buffer
-		This.Receiving = ""
+		This.Buffer = ""
 
 		*--- Reset Log
 		This.Log.Reset()
@@ -85,7 +83,7 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 		endif
 
 		m.lnReturn = This.Socket.Accept(m.Handle)
-			
+
 		*--- Connection error
 		if lnReturn # 0
 			*--- Debug log
@@ -129,22 +127,23 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 		*--- Debug log
 		This.Log.Add(1,"Process")
 
-		This.Receiving = This.Receiving + m.Request
+		*--- Concatenate buffer data
+		This.Buffer = This.Buffer + m.Request
 
 		do case
 		case This.Type = "HTTP" OR This.Type = "FCGI"
 			do case
 			case This.Type = "HTTP" && Hypertext Transport Protocol
 				*--- Incomplete request
-				if !(HEADER_DELIMITER $ This.Receiving)
+				if !(HEADER_DELIMITER $ This.Buffer)
 					return .T.
 				endif
 
 				*--- Request header
-				m.lcHeader = substr(This.Receiving,1,at(HEADER_DELIMITER,This.Receiving)+3)
+				m.lcHeader = substr(This.Buffer,1,at(HEADER_DELIMITER,This.Buffer)+3)
 
 				*--- Request can be received in multiple packets
-				if val(strextract(m.lcHeader,"Content-Length: ",CRLF))+len(m.lcHeader) > len(This.Receiving)
+				if val(strextract(m.lcHeader,"Content-Length: ",CRLF))+len(m.lcHeader) > len(This.Buffer)
 					return .T.
 				endif
 
@@ -175,16 +174,16 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 				endif
 			case This.Type = "FCGI" && FastCGI Protocol
 				*--- Incomplete request, wait next read event. FastCGI requests must end with a empty FCGI_STDIN record.
-				if right(This.Receiving,8) # bintoc(FCGI_VERSION_1,"1S")+bintoc(FCGI_STDIN,"1S") OR right(This.Receiving,4) # bintoc(0,"2S")+bintoc(0,"1S")
+				if right(This.Buffer,8) # UInt2Bin(FCGI_VERSION_1,1)+UInt2Bin(FCGI_STDIN,1) OR right(This.Buffer,4) # UInt2Bin(0,2)+UInt2Bin(0,1)
 					return .T.
 				endif
 
 				*--- Get request values
-				m.lcAccept = substr(This.Receiving,at("HTTP_ACCEPT",This.Receiving)+11,ctobin(chr(0)+substr(This.Receiving,at("HTTP_ACCEPT",This.Receiving)-1,1),"S"))
-				m.lcHost   = substr(This.Receiving,at("HTTP_HOST",This.Receiving)+9,ctobin(chr(0)+substr(This.Receiving,at("HTTP_HOST",This.Receiving)-1,1),"S"))
-				m.lcURI    = substr(This.Receiving,at("DOCUMENT_URI",This.Receiving)+12,ctobin(chr(0)+substr(This.Receiving,at("DOCUMENT_URI",This.Receiving)-1,1),"S"))
+				m.lcAccept = substr(This.Buffer,at("HTTP_ACCEPT",This.Buffer)+11,Bin2UInt(substr(This.Buffer,at("HTTP_ACCEPT",This.Buffer)-1,1)))
+				m.lcHost   = substr(This.Buffer,at("HTTP_HOST",This.Buffer)+9,Bin2UInt(substr(This.Buffer,at("HTTP_HOST",This.Buffer)-1,1)))
+				m.lcURI    = substr(This.Buffer,at("DOCUMENT_URI",This.Buffer)+12,Bin2UInt(substr(This.Buffer,at("DOCUMENT_URI",This.Buffer)-1,1)))
 			endcase
-			
+
 			*--- Update ThreadState to in use
 			This.CallBack.ThreadState = 2
 			This.CallBack.LastUse = datetime()
@@ -207,7 +206,7 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 				This.Gateway.Protocol   = alltrim(gateways.protocol)
 				This.Gateway.RemoteHost = alltrim(gateways.host)
 				This.Gateway.RemotePort = gateways.port
-				
+
 				*--- Process received data
 				This.Gateway.Process()
 			else
@@ -232,13 +231,11 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 				This.Tunnel.Password    = This.Password
 			endif
 
-			*--- Send request
-			This.Tunnel.Send(This.Receiving)
+			*--- Send buffer data
+			This.Tunnel.Send(This.Buffer)
 
 			*--- Clear buffer
-			This.Receiving = ""
-
-			return
+			This.Buffer = ""
 		case This.Type = "TUNNEX" && Tunnel Exit Points
 			if type("This.Tunnel") # "O"
 				*--- Create Tunnel object
@@ -251,18 +248,14 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 				This.Tunnel.Password    = This.Password
 			endif
 
-			*--- Send request
-			This.Tunnel.Receive(This.Receiving)
+			*--- Send buffer data
+			This.Tunnel.Receive(This.Buffer)
 
 			*--- Clear buffer
-			This.Receiving = ""
-
-			return
+			This.Buffer = ""
 		otherwise
-			*--- Unknow yype, disconnect
+			*--- Unknow type, disconnect
 			This.Disconnect()
-
-			return
 		endcase
 	ENDPROC
 
@@ -270,8 +263,7 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 	LOCAL llProcess,lcMethod,lcHTTP
 		*--- Continue processing, multiple requests (Pipelining)
 		m.llProcess = .T.
-
-		do while !empty(This.Receiving) AND m.llProcess
+		do while !empty(This.Buffer) AND m.llProcess
 			*--- Create WebServer Processor
 			This.NewObject("WebServer","WebServer","core\webserver.fxp")
 
@@ -325,3 +317,58 @@ DEFINE CLASS ThreadInterface AS CUSTOM
 	* 3 - Disconnecting
 	ThreadState = 1
 ENDDEFINE
+
+*--- Returns an Unsigned Integer from a Binary String
+FUNCTION Bin2UInt(Binary AS String)
+LOCAL lnLenght,lnByte,lcBinary
+	*--- Binary data length
+	m.lnLength = len(m.Binary)
+
+	*--- Reverses the binary expression
+	m.lcBinary = ""
+	for m.lnByte = 1 to m.lnLength
+		m.lcBinary = substr(m.Binary,m.lnByte,1) + m.lcBinary
+	next
+
+	*--- Convert using VFP2C32 functions
+	do case
+	case m.lnLength = 1
+		return Str2UShort(m.lcBinary)
+	case m.lnLength = 2
+		return Str2UShort(m.lcBinary)
+	case m.lnLength = 4
+		return Str2ULong(m.lcBinary)
+	case m.lnLength = 8
+		return Str2UInt64(m.lcBinary)
+	otherwise
+		error 11
+		return 0
+	endcase
+ENDFUNC
+
+*--- Returns an Binary String from an Unsigned Integer
+FUNCTION UInt2Bin(Value AS String, Length AS Integer)
+LOCAL lcBinary,lcReturn,lnByte
+	*--- Convert using VFP2C32 functions
+	do case
+	case m.Length = 1
+		return left(UShort2Str(m.Value),1)
+	case m.Length = 2
+		m.lcBinary = UShort2Str(m.Value)
+	case m.Length = 4
+		m.lcBinary = ULong2Str(m.Value)
+	case m.Length = 8
+		m.lcBinary = UInt642Str(m.Value)
+	otherwise
+		error 11
+		return ""
+	endcase
+
+	*--- Reverses the binary expression
+	m.lcReturn= ""
+	for m.lnByte = 1 to m.Length
+		m.lcReturn = substr(m.lcBinary,m.lnByte,1) + m.lcReturn
+	next
+
+	return m.lcReturn
+ENDFUNC

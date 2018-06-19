@@ -113,7 +113,7 @@ DEFINE CLASS Socket AS CUSTOM
 		*--- Read buffer
 		m.lcBuffer = ""
 		This.SocketWrench.Read(@m.lcBuffer)
-		
+
 		*--- Process request
 		This.Parent.Process(m.lcBuffer)
 	ENDPROC

@@ -50,12 +50,12 @@ DEFINE CLASS FCGIProtocol AS CUSTOM
 *!*			} FCGI_Header;
 
 			*--- Record data
-			This.Parent.Request.Type  = ctobin(chr(0)+substr(m.Request,2,1),"S")
-			This.Parent.Request.ReqID = ctobin(chr(0)+chr(0)+substr(m.Request,3,2),"S")
+			This.Parent.Request.Type  = Bin2UInt(substr(m.Request,2,1))
+			This.Parent.Request.ReqID = Bin2UInt(substr(m.Request,3,2))
 
 			*--- Request length and pad sizes
-			m.lnLength = ctobin(chr(0)+chr(0)+substr(m.Request,5,2),"S")
-			m.lnPad    = ctobin(chr(0)+substr(m.Request,7,1),"S")
+			m.lnLength = Bin2UInt(substr(m.Request,5,2))
+			m.lnPad    = Bin2UInt(substr(m.Request,7,1))
 
 			*--- Incomplete request, wait next read event
 			if len(m.Request) < FCGI_HEADER_LEN+m.lnLength+m.lnPad
@@ -78,17 +78,17 @@ DEFINE CLASS FCGIProtocol AS CUSTOM
 *!*				} FCGI_BeginRequestBody
 
 				*--- Request role
-				This.Parent.Request.Role = ctobin(chr(0)+chr(0)+substr(m.lcContent,1,2),"S")
+				This.Parent.Request.Role = Bin2UInt(substr(m.lcContent,1,2))
 				
 				*--- Keep alive connection 
-				This.Parent.Parent.KeepAlive = bitand(ctobin(substr(m.lcContent,3,1),"S"),FCGI_KEEP_CONN)
+				This.Parent.Parent.KeepAlive = bitand(Bin2UInt(substr(m.lcContent,3,1)),FCGI_KEEP_CONN)
 			case This.Parent.Request.Type = FCGI_PARAMS
 				do while !empty(m.lcContent)
 					*--- Header name length
-					m.lnNameLen = ctobin(chr(0)+substr(m.lcContent,1,1),"S")
+					m.lnNameLen = Bin2UInt(substr(m.lcContent,1,1))
 
 					*--- Header value length
-					m.lnValueLen = ctobin(chr(0)+substr(m.lcContent,2,1),"S")
+					m.lnValueLen = Bin2UInt(substr(m.lcContent,2,1))
 
 					if m.lnValueLen > 127
 *!*						typedef struct {
@@ -102,7 +102,7 @@ DEFINE CLASS FCGIProtocol AS CUSTOM
 *!*								((B3 & 0x7f) << 24) + (B2 << 16) + (B1 << 8) + B0];
 *!*						} FCGI_NameValuePair14;
 
-						m.lnValueLen  = ctobin(substr(m.lcContent,2,4),"4")
+						m.lnValueLen  = bitclear(Bin2UInt(substr(m.lcContent,2,4)),31)
 						m.lnNameStart = 1+4+1
 					else
 *!*						typedef struct {
@@ -213,8 +213,8 @@ DEFINE CLASS FCGIProtocol AS CUSTOM
 *!*			unsigned char reserved[3];
 *!*		} FCGI_EndRequestBody;
 
-		m.lcPacket = bintoc(0,"4S")+;
-					 bintoc(FCGI_REQUEST_COMPLETE,"1S")+;
+		m.lcPacket = UInt2Bin(0,4)+;
+					 UInt2Bin(FCGI_REQUEST_COMPLETE,1)+;
 					 replicate(chr(0),3)
 
 		if m.llSuccess AND !This.SendRecord(FCGI_END_REQUEST,m.lcPacket)
@@ -250,11 +250,11 @@ DEFINE CLASS FCGIProtocol AS CUSTOM
 			m.lnPad = 0
 		endif
 
-		m.lcRecord = bintoc(FCGI_VERSION_1,"1S")+;
-					 bintoc(lcType,"1S")+;
-					 bintoc(This.Parent.Request.ReqID,"2S")+;
-					 bintoc(m.lnLength,"2S")+;
-					 bintoc(m.lnPad,"1S")+;
+		m.lcRecord = UInt2Bin(FCGI_VERSION_1,1)+;
+					 UInt2Bin(lcType,1)+;
+					 UInt2Bin(This.Parent.Request.ReqID,2)+;
+					 UInt2Bin(m.lnLength,2)+;
+					 UInt2Bin(m.lnPad,1)+;
 					 chr(0)+;
 					 m.lcData+;
 					 replicate(chr(0),m.lnPad)
@@ -266,38 +266,19 @@ ENDDEFINE
 ******************************************************************************************
 * FCGI Gateway Class
 ********************
-DEFINE CLASS FCGIGateway AS CUSTOM
+DEFINE CLASS FCGIGateway AS Socket OF core\socket.prg
 
-	Log = NULL
-
-	Receiving   = ""
+	Buffer      = ""
 	Response    = ""
 
 	IsConnected = .F.
 
-	HIDDEN PROCEDURE Init()
+	PROCEDURE Init()
 		*--- Debug log
 		This.Parent.Parent.Log.Add(2,"Gateway.FCGI.Init")
-
-		*--- Add SocketWrench object
-		This.AddProperty("SocketWrench",createobject(CSWSOCK_CONTROL))
-
-		*--- Add SocketInterface object
-		This.AddObject("SocketWrenchInterface","SocketWrenchInterface")
-
-		*--- Bind events
-		EVENTHANDLER(This.SocketWrench,This.SocketWrenchInterface)
-
-		*--- Set connection properties
-		This.SocketWrench.Blocking = .F.
-		This.SocketWrench.Protocol = 6
-
-		*--- Disable Nagle Algorithm
-		This.SocketWrench.NoDelay = .T.
-	ENDPROC
-
-	PROCEDURE Destroy()
-		Log = ""
+		
+		*--- Run base class code
+		dodefault()
 	ENDPROC
 
 	PROCEDURE Error(nError,cMethod,nLine)
@@ -328,8 +309,8 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 *!*		} FCGI_BeginRequestBody
 
 		*--- Begin request Body
-		m.lcData = bintoc(FCGI_RESPONDER,"2S")+;
-				   bintoc(iif(This.Parent.Request.Connection = "keep-alive",FCGI_KEEP_CONN,0),"1S")+;
+		m.lcData = UInt2Bin(FCGI_RESPONDER,2)+;
+				   UInt2Bin(iif(This.Parent.Request.Connection = "keep-alive",FCGI_KEEP_CONN,0),1)+;
 				   chr(0)+chr(0)+chr(0)+chr(0)+chr(0)
 
 		m.llSuccess = .T.
@@ -411,7 +392,7 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 			m.lnValueLen = len(m.lcValue)
 
 			if m.lnNameLen > 127
-				m.lcNameLen  = bintoc(m.lnNameLen,"4")
+				m.lcNameLen  = UInt2Bin(bitset(m.lnNameLen,31),4)
 
 				*--- Type 41 or 44
 				if m.lnValueLen > 127
@@ -430,7 +411,7 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 *!*							((B3 & 0x7f) << 24) + (B2 << 16) + (B1 << 8) + B0];
 *!*					} FCGI_NameValuePair44;
 
-					m.lcValueLen = bintoc(m.lnValueLen,"4")							
+					m.lcValueLen = UInt2Bin(bitset(m.lnValueLen,31),4)
 				else
 *!*					typedef struct {
 *!*						unsigned char nameLengthB3;  /* nameLengthB3  >> 7 == 1 */
@@ -443,10 +424,10 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 *!*						unsigned char valueData[valueLength];
 *!*					} FCGI_NameValuePair41;
 
-					m.lcValueLen = bintoc(m.lnValueLen,"1S")							
+					m.lcValueLen = UInt2Bin(m.lnValueLen,1)
 				endif
 			else
-				m.lcNameLen  = bintoc(m.lnNameLen,"1S")
+				m.lcNameLen  = UInt2Bin(m.lnNameLen,1)
 
 				*--- Type 11 or 14
 				if m.lnValueLen > 127
@@ -461,7 +442,7 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 *!*							((B3 & 0x7f) << 24) + (B2 << 16) + (B1 << 8) + B0];
 *!*					} FCGI_NameValuePair14;
 
-					m.lcValueLen = bintoc(m.lnValueLen,"4")							
+					m.lcValueLen = UInt2Bin(bitset(m.lnValueLen,31),4)
 				else
 *!*					typedef struct {
 *!*						unsigned char nameLengthB0;  /* nameLengthB0  >> 7 == 0 */
@@ -470,7 +451,7 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 *!*						unsigned char valueData[valueLength];
 *!*					} FCGI_NameValuePair11;
 
-					m.lcValueLen = bintoc(m.lnValueLen,"1S")							
+					m.lcValueLen = UInt2Bin(m.lnValueLen,1)
 				endif
 			endif
 
@@ -534,11 +515,11 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 *!*		} FCGI_Header;
 
 		*--- Send record
-		m.lcRecord = bintoc(FCGI_VERSION_1,"1S")+;
-						  bintoc(lnType,"1S")+;
-						  bintoc(1,"2S")+;
-						  bintoc(m.lnLength,"2S")+;
-						  bintoc(m.lnPad,"1S")+;
+		m.lcRecord = UInt2Bin(FCGI_VERSION_1,1)+;
+						  UInt2Bin(lnType,1)+;
+						  UInt2Bin(1,2)+;
+						  UInt2Bin(m.lnLength,2)+;
+						  UInt2Bin(m.lnPad,1)+;
 						  chr(0)+;
 						  m.lcData
 
@@ -547,7 +528,7 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 
 	PROCEDURE SendResponse()
 	LOCAL lnType,lnReqID,lnLength,lnPad,lcContent,lcHeader,lcHeaderLen,lnSize,lnPos,lcPacket,lcStatus_Code,lcStatus_Description,llSuccess
-		do while !empty(This.Receiving)
+		do while !empty(This.Buffer)
 *!*			typedef struct {
 *!*				unsigned char version;
 *!*				unsigned char type;
@@ -560,23 +541,23 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 *!*			} FCGI_Header;
 
 			*--- Record data
-			m.lnType  = ctobin(chr(0)+substr(This.Receiving,2,1),"S")
-			m.lnReqID = ctobin(chr(0)+chr(0)+substr(This.Receiving,3,2),"S")
+			m.lnType  = Bin2UInt(substr(This.Buffer,2,1))
+			m.lnReqID = Bin2UInt(substr(This.Buffer,3,2))
 
-			*--- Response length and pad sizes
-			m.lnLength = ctobin(chr(0)+chr(0)+substr(This.Receiving,5,2),"S")
-			m.lnPad    = ctobin(chr(0)+substr(This.Receiving,7,1),"S")
+			*--- Response length and pad size
+			m.lnLength = Bin2UInt(substr(This.Buffer,5,2))
+			m.lnPad    = Bin2UInt(substr(This.Buffer,7,1))
 
 			*--- Incomplete response, wait next read event
-			if len(This.Receiving) < FCGI_HEADER_LEN+m.lnLength+m.lnPad
+			if len(This.Buffer) < FCGI_HEADER_LEN+m.lnLength+m.lnPad
 				return .T.
 			endif
 
 			*--- Response record
-			m.lcContent = substr(This.Receiving,FCGI_HEADER_LEN+1,m.lnLength)
+			m.lcContent = substr(This.Buffer,FCGI_HEADER_LEN+1,m.lnLength)
 
 			*--- Trim response
-			This.Receiving = substr(This.Receiving,FCGI_HEADER_LEN+1+m.lnLength+m.lnPad)
+			This.Buffer = substr(This.Buffer,FCGI_HEADER_LEN+1+m.lnLength+m.lnPad)
 
 			do case
 			case m.lnType = FCGI_END_REQUEST
@@ -666,83 +647,23 @@ DEFINE CLASS FCGIGateway AS CUSTOM
 		This.Parent.Parent.RemoveObject("Gateway")
 	ENDPROC
 
-	PROCEDURE Connect(Host AS Character, Port AS Integer)
-	LOCAL lcHost,llHost,lnCtrl
-		*--- Determine if host is a hostname or hostaddress
-		m.lcHost = chrtran(m.Host,".","")
-		m.llHost = .F.
-		for lnCtrl = 1 to len(m.lcHost)
-			if !isdigit(substr(m.lcHost,m.lnCtrl,1))
-				m.llHost = .T.
-				exit
-			endif
-		next
-
-		if m.llHost
-			This.SocketWrench.HostName = m.Host
-		else
-			This.SocketWrench.HostAddress = m.Host
-		endif
-		This.SocketWrench.RemotePort  = m.Port
-
-		*--- Connect
-		return This.SocketWrench.Connect() = 0
-	ENDPROC
-
-	PROCEDURE Disconnect()
-		return This.SocketWrench.Disconnect() = 0
-	ENDPROC
-
 	PROCEDURE Read()
 	LOCAL lcBuffer
 		*--- Read buffer
 		m.lcBuffer = ""
 		This.SocketWrench.Read(@m.lcBuffer)
 
-		This.Receiving = This.Receiving+m.lcBuffer
+		This.Buffer = This.Buffer+m.lcBuffer
 
 		*--- Send response
 		This.SendResponse()
 	ENDPROC
 
 	PROCEDURE Write(Data AS String)
-		return This.SocketWrench.Write(Data) # -1
-	ENDPROC
-
-	PROCEDURE OnAccept(Handle)
-	ENDPROC
-
-	PROCEDURE OnCancel()
-	ENDPROC
-
-	PROCEDURE OnConnect()
+		return This.SocketWrench.Write(createbinary(Data)) # -1
 	ENDPROC
 
 	PROCEDURE OnDisconnect()
 		This.Parent.Parent.Disconnect()
-	ENDPROC
-
-	PROCEDURE OnError(ErrorCode,Description)
-	ENDPROC
-
-	PROCEDURE OnProgress(BytesTotal,BytesCopied,Percent)
-	ENDPROC
-
-	PROCEDURE OnRead()
-		This.Read()
-	ENDPROC
-
-	PROCEDURE OnTimeout()
-	ENDPROC
-
-	PROCEDURE OnTimer()
-	ENDPROC
-
-	PROCEDURE OnWrite()
-	ENDPROC
-
-	*--- Properties
-	HIDDEN PROCEDURE IsConnected_Access()
-		return This.SocketWrench.Connected
 	ENDPROC
 ENDDEFINE

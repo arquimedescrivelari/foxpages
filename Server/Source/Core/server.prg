@@ -14,6 +14,7 @@ DEFINE CLASS Server AS CUSTOM OLEPUBLIC
 	*--- HTTP
 	*--- FCGI
 	*--- TUNNEL
+	*--- TUNNEX
 	Type = ""
 
 	*--- Connection bandwidth in kilobytes (Don't work in development mode)
@@ -341,7 +342,7 @@ DEFINE CLASS Server AS CUSTOM OLEPUBLIC
 				case m.loThread.ThreadState = 1 AND datetime()-m.loThread.LastUse > 30
 					*--- Disconnect when idle for 30 seconds
 					m.loThread.ThreadState = 3
-					
+
 					m.loThread = evaluate("Thread"+alltrim(str(m.lnThread)))
 					m.loThread.Disconnect()
 				endcase
@@ -395,7 +396,7 @@ DEFINE CLASS ServerProc AS TIMER
 
 					*--- Disable timmer
 					This.Enabled = .F.
-					
+
 					*--- Process
 					m.loThread.Continue()
 

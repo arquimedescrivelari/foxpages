@@ -1,7 +1,7 @@
 ******************************************************************************************
 * Log class
 ***********
-DEFINE CLASS Log AS Custom
+DEFINE CLASS Log AS CUSTOM
 	*--- Hide class properties
 	HIDDEN BaseClass,ClassLibrary,Class,Comment,ControlCount,Controls,Height,HelpContextID,Left,Objects,Parent,ParentClass,Picture,Tag,Top,WhatsThisHelpID,Width
 
@@ -199,7 +199,7 @@ DEFINE CLASS Log AS Custom
 			SELECT (lcLogFile)
 			USE
 		endif
-		
+
 		*--- Restore selected alias
 		if !empty(lcAlias)
 			select (lcAlias)

@@ -37,14 +37,14 @@ DEFINE CLASS WebServer AS CUSTOM
 	ENDPROC
 
 	PROCEDURE Process()
-	LOCAL llBadRequest,lnLength,ldFile
+	LOCAL llBadRequest,lcRequest,lnLength,ldFile
 		do case
 		case This.Parent.Type = "HTTP"
 			*--- Determine the size of request
-			m.lnLength  = at(HEADER_DELIMITER,This.Parent.Receiving)+3+val(strextract(This.Parent.Receiving,"Content-Length: ",CRLF))
+			m.lnLength  = at(HEADER_DELIMITER,This.Parent.Buffer)+3+val(strextract(This.Parent.Buffer,"Content-Length: ",CRLF))
 
 			*--- Request
-			m.lcRequest = substr(This.Parent.Receiving,1,m.lnLength)
+			m.lcRequest = substr(This.Parent.Buffer,1,m.lnLength)
 
 			*--- Create HTTP Processor
 			This.NewObject("Parser","HTTPProtocol","core\http.fxp")
@@ -53,11 +53,12 @@ DEFINE CLASS WebServer AS CUSTOM
 			if !This.Parser.Process(m.lcRequest)
 				return .F.
 			endif
-		
-			*--- Remove request
-			This.Parent.Receiving = substr(This.Parent.Receiving,m.lnLength+1)
+
+			*--- Remove request from buffer
+			This.Parent.Buffer = substr(This.Parent.Buffer,m.lnLength+1)
 		case This.Parent.Type = "FCGI"
-			m.lcRequest = This.Parent.Receiving
+			*--- Request
+			m.lcRequest = This.Parent.Buffer
 
 			*--- Create FCGI Processor
 			This.NewObject("Parser","FCGIProtocol","core\fcgi.fxp")
@@ -67,8 +68,8 @@ DEFINE CLASS WebServer AS CUSTOM
 				return .F.
 			endif
 
-			*--- Clear request
-			This.Parent.Receiving = ""
+			*--- Clear buffer
+			This.Parent.Buffer = ""
 		endcase
 
 		*--- Debug log
@@ -94,7 +95,7 @@ DEFINE CLASS WebServer AS CUSTOM
 			This.SendError("400","Bad Request","Bad Request")
 			return .T.
 		endif
-		
+
 		*--- Working directory
 		if empty(This.Request.Document_Root)
 			*--- Open sites table
@@ -473,7 +474,7 @@ DEFINE CLASS WebServer AS CUSTOM
 		endif
 
 		*--- Connection
-		if This.Parent.KeepAlive = 1 AND This.Response.Connection == "keep-alive" AND !This.Parent.Queued
+		if This.Parent.KeepAlive = 1 AND lower(This.Response.Connection) == "keep-alive" AND !This.Parent.Queued
 			This.Response.Header = This.Response.Header + "Connection: keep-alive"+CRLF
 			This.Parent.IsClosing = .F.
 		else
@@ -558,7 +559,7 @@ DEFINE CLASS WebServer AS CUSTOM
 			This.Response.Header = This.Response.Header + "Pragma: "+This.Response.Pragma+CRLF
 		endif
 
-		*--- Transfer_Encoding
+		*--- Transfer-Encoding
 		if !empty(This.Response.Transfer_Encoding)
 			This.Response.Header = This.Response.Header + "Transfer-Encoding: "+This.Response.Transfer_Encoding+CRLF
 		endif
@@ -776,7 +777,7 @@ DEFINE CLASS WebServer AS CUSTOM
 		if isdigit(left(m.lcResult,1))
 			m.lcResult= "_"+m.lcResult
 		endif
-		
+
 		return m.lcResult
 	ENDPROC
 ENDDEFINE

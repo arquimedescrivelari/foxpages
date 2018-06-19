@@ -95,7 +95,7 @@ DEFINE CLASS HTTPProtocol AS CUSTOM
 
 			*--- Find delimiteer
 			m.lnPos = at(":",m.lcData)
-			
+
 			if !empty(m.lnPos)
 				*--- Header name
 				m.lcName = substr(m.lcData,1,lnPos-1)

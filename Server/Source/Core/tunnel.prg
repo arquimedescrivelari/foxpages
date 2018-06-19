@@ -13,7 +13,7 @@ DEFINE CLASS Tunnel AS Socket OF core\socket.prg
 	PROCEDURE Init()
 		*--- Debug log
 		This.Parent.Log.Add(2,"Tunnel.Init")
-		
+
 		dodefault()
 	ENDPROC
 
@@ -38,7 +38,7 @@ DEFINE CLASS Tunnel AS Socket OF core\socket.prg
 		if !This.IsConnected
 			This.Connect(This.RemoteHost,This.RemotePort)
 		endif
-		
+
 		*--- Compress
 		if !empty(This.Compression)
 			m.Data = zipstring(m.Data)

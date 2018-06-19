@@ -38,7 +38,7 @@ DEFINE CLASS Gateway AS CUSTOM
 	ENDPROC
 
 	PROCEDURE Error(nError,cMethod,nLine)
-		This.Log.Add(0,"Gateway.Error","Method: "+proper(m.cMethod)+CRLF+"Message: "+message())
+		This.Parent.Log.Add(0,"Gateway.Error","Method: "+proper(m.cMethod)+CRLF+"Message: "+message())
 	ENDPROC
 
 	PROCEDURE Process()
@@ -46,10 +46,10 @@ DEFINE CLASS Gateway AS CUSTOM
 		do case
 		case This.Parent.Type = "HTTP"
 			*--- Determine the size of request
-			m.lnLength  = at(HEADER_DELIMITER,This.Parent.Receiving)+3+val(strextract(This.Parent.Receiving,"Content-Length: ",CRLF))
+			m.lnLength  = at(HEADER_DELIMITER,This.Parent.Buffer)+3+val(strextract(This.Parent.Buffer,"Content-Length: ",CRLF))
 
 			*--- Request
-			m.lcRequest = substr(This.Parent.Receiving,1,m.lnLength)
+			m.lcRequest = substr(This.Parent.Buffer,1,m.lnLength)
 
 			*--- Create HTTP Processor
 			if type("This.Parser") # "O"
@@ -61,11 +61,11 @@ DEFINE CLASS Gateway AS CUSTOM
 				return .F.
 			endif
 
-			*--- Remove request
-			This.Parent.Receiving = substr(This.Parent.Receiving,m.lnLength+1)
+			*--- Remove request from buffer
+			This.Parent.Buffer = substr(This.Parent.Buffer,m.lnLength+1)
 		case This.Parent.Type = "FCGI"
 			*--- Request
-			m.lcRequest = This.Parent.Receiving
+			m.lcRequest = This.Parent.Buffer
 
 			*--- Create FCGI Processor
 			if type("This.Parser") # "O"
@@ -77,8 +77,8 @@ DEFINE CLASS Gateway AS CUSTOM
 				return .F.
 			endif
 
-			*--- Clear request
-			This.Parent.Receiving = ""
+			*--- Clear buffer
+			This.Parent.Buffer = ""
 		endcase
 
 		*--- Convert \ to / and remove the last /
@@ -156,11 +156,6 @@ DEFINE CLASS Request AS CUSTOM
 	Server_Software			= ""
 	Type					= 0
 	User_Agent				= ""
-
-	PROCEDURE Error(nError,cMethod,nLine)
-		*--- Debug log
-		This.Parent.Parent.Log.Add(0,"Gateway.Request.Error","Method: "+proper(m.cMethod)+CRLF+"Message: "+message())
-	ENDPROC
 ENDDEFINE
 
 ******************************************************************************************
