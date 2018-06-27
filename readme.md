@@ -1,4 +1,4 @@
-# Fox Pages Server 3.0
+# Fox Pages Server 3.1
 
 [![PTBR](http://flags.fmcdn.net/data/flags/h80/br.png)<br>Português](readme_ptbr.md)
 
@@ -238,6 +238,12 @@ The version configuration used, free or commercial, or the version of SocketWren
 //#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"  
 
 You need to recompile the project after you change these settings.
+
+## What's New?
+
+### v3.1 - Release 2018.06.26
+
+- Security update. SocketWrench Control updated to version 9.3 (Release Notes at https://sockettools.com/release-notes/)
 
 ## Credits
 
