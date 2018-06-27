@@ -39,6 +39,9 @@ DEFINE CLASS Socket AS CUSTOM
 
 		*--- Disable Nagle Algorithm
 		This.SocketWrench.NoDelay = .T.
+
+		*--- Set to pass array by referency and to not convert to string
+		COMARRAY(This.SocketWrench,1010)
 	ENDPROC
 
 	PROCEDURE Error(nError,cMethod,nLine)
@@ -52,7 +55,7 @@ DEFINE CLASS Socket AS CUSTOM
 			m.lcMessage = m.lcMessage+CRLF+alltrim(str(stack[m.lnCtrl,1]-1))+") "+stack[m.lnCtrl,2]+" ("+stack[m.lnCtrl,3]+","+alltrim(str(stack[m.lnCtrl,5]))+")"
 		next
 
-		strtofile(m.lcMessage+CRLF+CRLF,"logs\socket.log")
+		strtofile(m.lcMessage+CRLF+CRLF,"logs\socket.log",.T.)
 	ENDPROC
 
 	PROCEDURE Listen(IP AS String,Port AS Integer)
@@ -98,7 +101,7 @@ DEFINE CLASS Socket AS CUSTOM
 	ENDPROC
 
 	PROCEDURE Read()
-	LOCAL lcBuffer
+	LOCAL laBuffer,lcBuffer,lnSize,lnByte
 		*--- Wait to read
 		do while !This.IsReadable
 			*--- Check connection
@@ -110,9 +113,27 @@ DEFINE CLASS Socket AS CUSTOM
 			sleep(10)
 		enddo
 
-		*--- Read buffer
+		*--- Create byte array buffer
+		DIMENSION laBuffer[1024] AS Byte
+
 		m.lcBuffer = ""
-		This.SocketWrench.Read(@m.lcBuffer)
+		do while This.IsReadable
+			*--- Reset byte array
+			m.laBuffer = 0
+
+			*--- Read data to byte array
+			m.lnSize = This.SocketWrench.Read(@m.laBuffer)
+
+			*--- Check data was received
+			if m.lnSize < 1
+				exit
+			endif
+
+			*--- Convert byte array to string
+			for m.lnByte = 1 to m.lnSize
+				m.lcBuffer = m.lcBuffer + chr(m.laBuffer[m.lnByte])
+			next
+		enddo
 
 		*--- Process request
 		This.Parent.Process(m.lcBuffer)
@@ -164,7 +185,7 @@ DEFINE CLASS Socket AS CUSTOM
 		next
 
 		*--- Log
-		strtofile(alltrim(str(m.ErrorCode))+" - "+m.Description+CRLF+m.lcMessage+CRLF+CRLF,"logs\socket.log")
+		strtofile(alltrim(str(m.ErrorCode))+" - "+m.Description+CRLF+m.lcMessage+CRLF+CRLF,"logs\socket.log",.T.)
 	ENDPROC
 
 	PROCEDURE OnProgress(BytesTotal,BytesCopied,Percent)

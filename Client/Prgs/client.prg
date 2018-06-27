@@ -1989,6 +1989,9 @@ DEFINE CLASS Socket AS CUSTOM
 
 		*--- Disable Nagle Algorithm
 		This.SocketWrench.NoDelay = .T.
+
+		*--- Set to pass array by referency and to not convert to string
+		COMARRAY(This.SocketWrench,1010)
 	ENDPROC
 
 	HIDDEN PROCEDURE Destroy()
@@ -2032,15 +2035,47 @@ DEFINE CLASS Socket AS CUSTOM
 	ENDPROC
 
 	PROCEDURE Read()
-		lcBuffer = ""
-		This.SocketWrench.Read(@lcBuffer)
-		
+	LOCAL laBuffer,lcBuffer,lnSize,lnByte
+		*--- Wait to read
+		do while !This.IsReadable
+			*--- Check connection
+			if !This.SocketWrench.IsConnected
+				This.Parent.Disconnect()
+				return .F.
+			endif
+
+			sleep(10)
+		enddo
+
+		*--- Create byte array buffer
+		DIMENSION laBuffer[1024] AS Byte
+
+		m.lcBuffer = ""
+		do while This.IsReadable
+			*--- Reset byte array
+			m.laBuffer = 0
+
+			*--- Read data to byte array
+			m.lnSize = This.SocketWrench.Read(@m.laBuffer)
+
+			*--- Check data was received
+			if m.lnSize < 1
+				exit
+			endif
+
+			*--- Convert byte array to string
+			for m.lnByte = 1 to m.lnSize
+				m.lcBuffer = m.lcBuffer + chr(m.laBuffer[m.lnByte])
+			next
+		enddo
+
 		*--- Log
 		if This.LogLevel > 1 AND !empty(lcBuffer)
 			strtofile("Socket.Read()"+iif(This.LogLevel > 2,CRLF+lcBuffer,""),This.LogFile,1)
 		endif
-		
-		return lcBuffer
+
+		*--- Return data
+		return m.lcBuffer
 	ENDPROC
 
 	HIDDEN PROCEDURE Error(nError, cMethod, nLine)
