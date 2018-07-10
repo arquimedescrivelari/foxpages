@@ -648,10 +648,39 @@ DEFINE CLASS FCGIGateway AS Socket OF core\socket.prg
 	ENDPROC
 
 	PROCEDURE Read()
-	LOCAL lcBuffer
-		*--- Read buffer
+	LOCAL laBuffer,lcBuffer,lnSize,lnByte
+		*--- Wait to read
+		do while !This.IsReadable
+			*--- Check connection
+			if !This.SocketWrench.IsConnected
+				This.Parent.Disconnect()
+				return .F.
+			endif
+
+			sleep(10)
+		enddo
+
+		*--- Create byte array buffer
+		DIMENSION laBuffer[1024] AS Byte
+
 		m.lcBuffer = ""
-		This.SocketWrench.Read(@m.lcBuffer)
+		do while .T.
+			*--- Reset byte array
+			m.laBuffer = 0
+
+			*--- Read data to byte array
+			m.lnSize = This.SocketWrench.Read(@m.laBuffer)
+
+			*--- Check data was received
+			if m.lnSize < 1
+				exit
+			endif
+
+			*--- Convert byte array to string
+			for m.lnByte = 1 to m.lnSize
+				m.lcBuffer = m.lcBuffer + chr(m.laBuffer[m.lnByte])
+			next
+		enddo
 
 		This.Buffer = This.Buffer+m.lcBuffer
 
