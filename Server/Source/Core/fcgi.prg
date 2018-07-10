@@ -664,7 +664,7 @@ DEFINE CLASS FCGIGateway AS Socket OF core\socket.prg
 		DIMENSION laBuffer[1024] AS Byte
 
 		m.lcBuffer = ""
-		do while .T.
+		do while This.IsReadable
 			*--- Reset byte array
 			m.laBuffer = 0
 
