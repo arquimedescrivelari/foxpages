@@ -231,7 +231,9 @@ With Fox Pages Server you can build a REST API to serve the requests of the BOA 
 After setting up your Visual Fox pages, you can test the power of this combination. Start the demo on https://www.BOA-platform.com or by this direct link: http://demo.boa-platform.com. When the login screen appears, you can use the following:
 
 User: en
+
 Password: en01
+
 URL of API server: http://localhost/boa. This is your local Fox Pages Server.
 
 See the demo/boa folder for the sample source code.

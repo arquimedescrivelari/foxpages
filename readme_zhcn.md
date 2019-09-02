@@ -230,8 +230,10 @@ REST (Representational State Transfer)
 设置Visual Fox页面后，您可以测试此组合的功能。 在https://www.BOA-platform.com上或通过以下直接链接启动演示：http：//demo.boa-platform.com。 出现登录屏幕时，您可以使用以下内容：
 
 用户：en
+
 密码：en01
-API服务器的URL：http：// localhost / boa。 这是您当地的Fox Pages Server。
+
+API服务器的URL：http://localhost/boa。 这是您当地的Fox Pages Server。
 
 有关示例源代码，请参阅demo / boa文件夹。
 

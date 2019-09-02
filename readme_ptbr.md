@@ -229,7 +229,9 @@ Com Fox Pages Server você pode criar uma API REST para responder requisições 
 Após a instalação do Fox Pages Server, você pode testar o poder desta combinação. Inicie o demo em https://www.boa-platform.com ou por este link direto: http://demo.boa-platform.com. Quando a tela de login aparecer, use o seguinte:
 
 Usuário: en
+
 Senha: en01
+
 URL of API server: http://localhost/boa. Este é seu Fox Pages Server local.
 
 Veja a pasta demo/boa para o código fonte deste demo.
