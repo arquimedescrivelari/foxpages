@@ -1,4 +1,4 @@
-# Fox Pages Server 3.1
+# Fox Pages Server 3.5
 
 ## O que é isto?
 
@@ -7,6 +7,8 @@ O Fox Pages Server (FPS) é um servidor HTTP, HTTPS e FastCGI multithread para V
 Com o Fox Pages Server é possível desenvolver, depurar e distribuir conteúdo e aplicações para web utilizando o Visual FoxPro.
 
 O Fox Pages Server não possibilita que código Visual FoxPro seja executado na internet. Por isso é necessário conhecimento das liguagens e ferramentas de desenvolvimento para internet que serão utilizadas, por exemplo: HTML, CSS, Javascript, JQuery, Dojo etc.
+
+O Fox Pages Server pode ser usado com o boa-platform. Deste modo você pode criar aplicações Web sem mnenhum conhecimento de linguagens web. O Fox Pages se comunica com o serviço BOA.
 
 ## Requisitos
 Microsoft Visual FoxPro 9.0
@@ -37,7 +39,7 @@ O debuguer do Visual FoxPro só funcionará no modo de desenvolvimento, pois é 
 2) Execute o arquivo install.bat. (Para instalar no Windows 10 execute usando Prompt de comando como administrador)
 
 ### Dica de segurança
-Não é recomendado deixar os arquivos .HTML com os seus compilados .FXP na mesma pasta do servidor, eles podem ser baixados se a extensão for trocada no webbrowser.
+Não é recomendado deixar os arquivos .HTML com os seus compilados .FXP na mesma pasta do servidor, eles podem ser baixados se a extensão for trocada no navegador.
 
 ## Antes de iniciar
 O Fox Pages usa a porta 80 como padrão para HTTP, portanto antes de iniciar é necessário parar qualquer serviço que esteja usando a porta 80 (IIS, Apache, etc) ou alterar a porta usada no programa HTTP.PRG localizado na pasta SERVERS no o modo desenvolvimento, ou no campo PORT da tabela SERVERS.DBF localizado na pasta DATA no modo de distribuição.
@@ -98,6 +100,21 @@ A tabela REALM.DBF define as configurações de acesso as pastas do site.
 A tabela USERS.DBF define os usuários que terão acesso as pastas.
 
 A table REALMUSER.DBF relaciona os usuários com as pastas.
+
+### CORS (Cross-Origin Resource Sharing)
+É um mecanismo dos navegadores que impedem que uma origem (domínio) acesse recursos em uma origem distinta (outro domínio) sem autorização.
+
+Configure as autorizações adicionando, modificando ou excluindo registros na tabela CORS.DBF.
+
+Informe o site que concederá autorização no campo SITE. Este campo é relacionado com a tabela SITES.DBF.
+
+Informe a origem (domíno autorizado) no campo ORIGIN, caso seja preenchido com "*" qualquer origem será permitida.
+
+Informe o recurso no campo URI, caso seja preenchido com "*" qualquer recuso será permitido.
+
+Os campos GET, POST, PUT, DELETE, HEAD e OPTIONS determinam quais metódos são permitidos.
+
+O campo HEADER deve ser preenchido com os headers HTTP permitidos. Devem ser delimitados com uma virgula seguida de um espaço.
 
 ## Configuração de servidores FastCGI
 
@@ -201,9 +218,21 @@ Fim
 ## Aplicações RESTfull
 REST (Representational State Transfer) é um estilo arquitetônico que defende que os aplicativos da Web devem usar o HTTP como era originalmente previsto, onde as requisições GET, PUT, POST e DELETE devem ser usados para consulta, alteração, criação e exclusão, respectivamente.
 
-O Fox Pages Server processa uma requisição como REST sempre que o header Accept for "application/json".
+O Fox Pages Server processa uma requisição como REST sempre que o header Accept for "application/json" ou "application/xml".
 
 Mais detalhes podem ser encontrados no aplicativo disponível no site de demonstração ao entrar com a conta do representante.
+
+### BOA Plataform
+
+Com Fox Pages Server você pode criar uma API REST para responder requisições da plataforma BOA. Você pode criar uma aplicação web completa usando o Visual Foxpro. O Fox Server Pages responderá as requisições que são enviadas pela plataforma BOA. Os dados que são trocados entre o Fox Pages Server e o BOA são strings JSON que são fáceis de entender.
+
+Após a instalação do Fox Pages Server, você pode testar o poder desta combinação. Inicie o demo em https://www.boa-platform.com ou por este link direto: http://demo.boa-platform.com. Quando a tela de login aparecer, use o seguinte:
+
+Usuário: en
+Senha: en01
+URL of API server: http://localhost/boa. Este é seu Fox Pages Server local.
+
+Veja a pasta demo/boa para o código fonte deste demo.
 
 ## Incompatibilidade com a versão 2.0
 Para o suporte ao protocolo FastCGI o processamento das propriedades dos objetos Request e Response foram alteradas.
@@ -238,6 +267,14 @@ A configuração versão utilizada, gratuita ou comercial, ou a versão do Socke
 É necessário recompilar o projeto após alterar estas configurações.
 
 ## Novidades?
+
+### v3.5 - Lançamento 2019.09.02
+
+- Suporte para plataform BOA
+- Suporte para CORS (Cross-Origin Resource Sharing)
+- Correção do erro de leitura de dados com conexões seguras
+- Algumas classes e propriedade renomeadas
+- Atualização de segurança. Controle SocketWrench atualizado para a versão 9.5 (Notas de versão em https://sockettools.com/release-notes/)
 
 ### v3.1 - Lançamento 2018.06.26
 

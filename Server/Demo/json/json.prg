@@ -137,7 +137,7 @@ DEFINE CLASS json AS custom
 		ENDIF
 
 		IF VARTYPE(m.tcKey) = "C"
-			m.lcKey = ["] + m.tcKey + [": ]
+			m.lcKey = ["] + THIS.serializekey(m.tcKey) + [": ]
 		ELSE
 			m.lcKey = ""
 		ENDIF
@@ -227,7 +227,6 @@ DEFINE CLASS json AS custom
 		*!*	http://www.jsonlint.com/
 		*********************************************************************
 	ENDPROC
-
 
 	PROCEDURE parse
 		LPARAMETERS tcJSONString, tcReviver, tvValue, ;
@@ -863,13 +862,15 @@ DEFINE CLASS json AS custom
 				ENDIF
 			ENDFOR
 		ELSE
-			FOR m.lnRowCounter = 1 TO m.lnRows
-				m.lcRow = THIS.stringify(m.taArray(m.lnRowCounter), @m.tvReplacer, m.tvSpace, m.lnMultiLevel + 1)
-				IF THIS.Isundefined(m.lcRow)
-					loop
-				ENDIF
-				m.lcReturnJSONArray = m.lcReturnJSONArray + IIF(!EMPTY(m.lcReturnJSONArray), ",", "") + m.lcRow
-			ENDFOR
+			IF !ISNULL(m.taArray)
+				FOR m.lnRowCounter = 1 TO m.lnRows
+					m.lcRow = THIS.stringify(m.taArray(m.lnRowCounter), @m.tvReplacer, m.tvSpace, m.lnMultiLevel + 1)
+					IF THIS.Isundefined(m.lcRow)
+						loop
+					ENDIF
+					m.lcReturnJSONArray = m.lcReturnJSONArray + IIF(!EMPTY(m.lcReturnJSONArray), ",", "") + m.lcRow
+				ENDFOR
+			ENDIF
 		ENDIF
 		m.lcReturnJSONArray = "[" + m.lcReturnJSONArray + m.lcArrayIndent + "]"
 
@@ -2313,6 +2314,38 @@ DEFINE CLASS json AS custom
 	ENDPROC
 
 
+	PROTECTED PROCEDURE serializekey
+		LPARAMETERS tcJSONKey
+
+		*********************************************************************
+		*!* PURPOSE
+		*********************************************************************
+		*!*		Rename a JSON key
+		*********************************************************************
+		*!* PARAMETERS
+		*********************************************************************
+		*!*		tcJSONKey
+		*!*			A string representing a valid JSON key
+		*********************************************************************
+		*!*	RETURN
+		*********************************************************************
+		*!*		String - JSON Key
+		*********************************************************************
+
+		LOCAL lcReturnJustKey,lnAlias
+
+		m.lcReturnJustKey = tcJSONKey
+		
+		IF  !ISNULL(THIS.PropertyAlias[1])
+			m.lnAlias = ascan(THIS.PropertyAlias,m.lcReturnJustKey,-1,-1,1,8)
+			IF !EMPTY(m.lnAlias)
+				m.lcReturnJustKey = THIS.PropertyAlias[m.lnAlias,2]
+			ENDIF
+		ENDIF
+		
+		RETURN (m.lcReturnJustKey)
+	ENDPROC
+
 	PROTECTED PROCEDURE deserializekey
 		LPARAMETERS tcJSONKey
 
@@ -2331,15 +2364,21 @@ DEFINE CLASS json AS custom
 		*!*		String - JSON Key
 		*********************************************************************
 
-		LOCAL lcReturnJustKey
+		LOCAL lcReturnJustKey,lnAlias
 
 		m.lcReturnJustKey = GETWORDNUM(m.tcJSONKey, 1, ":") && strip the : if it exists
 		m.lcReturnJustKey = STRTRAN(m.lcReturnJustKey,["],"") && strip the " if they exist
 		m.lcReturnJustKey = ALLTRIM(m.lcReturnJustKey)
 
+		IF  !ISNULL(THIS.PropertyAlias[1])
+			m.lnAlias = ascan(THIS.PropertyAlias,m.lcReturnJustKey,-1,-1,2,8)
+			IF !EMPTY(m.lnAlias)
+				m.lcReturnJustKey = THIS.PropertyAlias[m.lnAlias,1]
+			ENDIF
+		ENDIF
+		
 		RETURN (m.lcReturnJustKey)
 	ENDPROC
-
 
 	PROTECTED PROCEDURE createnewobject
 		LPARAMETERS tvClassOrInstance, tcClassModule
@@ -2627,5 +2666,8 @@ DEFINE CLASS json AS custom
 		*!* if This.Parse() returned an Undefined value.
 		*********************************************************************
 		THIS.Undefined = CHR(0)
+
+		*-- Array of properties aliases
+		THIS.AddProperty("PropertyAlias[1]",NULL)
 	ENDPROC
 ENDDEFINE

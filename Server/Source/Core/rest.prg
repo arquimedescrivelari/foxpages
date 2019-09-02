@@ -12,7 +12,7 @@ DEFINE CLASS RESTProcessor AS SESSION
 
 	PROCEDURE Init()
 		*--- Debug log
-		This.Parent.Parent.Log.Add(3,"Webserver.REST.Init")
+		This.Parent.Parent.Log.Add(3,"Web.REST.Init")
 
 		*--- Sets
 		set deleted on
@@ -23,7 +23,7 @@ DEFINE CLASS RESTProcessor AS SESSION
 
 	PROCEDURE Destroy()
 		*--- Debug log
-		This.Parent.Parent.Log.Add(3,"Webserver.REST.Destroy")
+		This.Parent.Parent.Log.Add(3,"Web.REST.Destroy")
 	ENDPROC
 
 	PROCEDURE Error(nError,cMethod,nLine)
@@ -42,7 +42,7 @@ DEFINE CLASS RESTProcessor AS SESSION
 		m.lcMessage = substr(m.lcMessage,1,len(m.lcMessage)-2)+'}'
 
 		*--- Debug log
-		This.Parent.Parent.Log.Add(0,"Webserver.REST.Error",strtran(m.lcMessage,"\r\n",CRLF))
+		This.Parent.Parent.Log.Add(0,"Web.REST.Error",strtran(m.lcMessage,"\r\n",CRLF))
 
 		*--- Send error
 		This.Parent.SendError("500","Internal Server Error","Runtime Error",m.lcMessage)
@@ -51,7 +51,7 @@ DEFINE CLASS RESTProcessor AS SESSION
 	PROCEDURE Process(Target AS String)
 	LOCAL lnDirs
 		*--- Debug log
-		This.Parent.Parent.Log.Add(3,"Webserver.REST.Process")
+		This.Parent.Parent.Log.Add(3,"Web.REST.Process")
 
 		*--- Work directory
 		This.Directory = This.Parent.Directory
@@ -81,13 +81,17 @@ DEFINE CLASS RESTProcessor AS SESSION
 			return .F.
 		endif
 
+		*--- Set path directory
+		set path to (This.Directory)
+
 		*--- Add / to directory
 		This.Directory = This.Directory+"/"
 
-		*--- Set path directory
-		set path to (This.Directory)
-		for m.lnDirs = 3 to adir(aDirs,This.Directory+"*.*","D")
-			if aDirs[m.lnDirs,5] = "....D"
+		for m.lnDirs = 1 to adir(aDirs,This.Directory+"*.*","D")
+			if aDirs[m.lnDirs,1] = "."
+				loop
+			endif
+			if "D" $ aDirs[m.lnDirs,5]
 				set path to (This.Directory+aDirs[m.lnDirs,1]) additive
 			endif
 		next

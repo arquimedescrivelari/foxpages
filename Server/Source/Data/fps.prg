@@ -44,13 +44,14 @@ SET TEXTMERGE ON
 
 *ADBObjects(aDBTable, "Table")
 
-dimension aDBTable[6]
+dimension aDBTable[7]
 aDBTable[1] = "SERVERS"
 aDBTable[2] = "SITES"
 aDBTable[3] = "GATEWAYS"
 aDBTable[4] = "REALMS"
 aDBTable[5] = "USERS"
 aDBTable[6] = "REALMUSER"
+aDBTable[7] = "CORS"
 
 If VarType(aDBTable) <> "U"
 	* Sort the array

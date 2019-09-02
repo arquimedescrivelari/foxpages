@@ -1,4 +1,4 @@
-﻿# Fox Pages Server 3.0
+﻿# Fox Pages Server 3.5
 
 ## 这是什么玩意儿?
 
@@ -7,6 +7,8 @@ Fox Pages Server (FPS) 是一个针对 Visual FoxPro 的多线程 HTTP, HTTPS, �
 利用 Fox Pages Server 你可以通过使用 Visual FoxPro 来开发、调试以及分发 WEB 内容和应用程序。
 
 Fox Pages Server 并不能允许在 Internet 上运行 Visual FoxPro 代码。所以，你还必须要知道和了解和 Internet 有关的语言和开发工具，例如：HTML,CSS,Javascript,JQuery,Dojo 等等。
+
+Fox Pages Server可以与boa平台结合使用。 这样，您可以在不了解Web开发语言的情况下创建Web应用程序。 Fox Pages Server与BOA通信。
 
 ## 前提条件
 Microsoft Visual FoxPro 9.0
@@ -98,6 +100,21 @@ REALM.DBF 负责设置针对站点目录的访问控制。
 USERS.DBF 定义了可以访问文件夹的用户。
 
 REALMUSER.DBF 列出了拥有文件夹的用户。
+
+### CORS（跨源资源共享）
+它是一种浏览器机制，可防止原始（域）未经授权访问不同来源（另一个域）中的资源。
+
+通过在CORS.DBF表中添加，修改或删除记录来配置授权。
+
+在SITE字段中输入将授予授权的站点。 该字段与SITES.DBF表相关。
+
+在ORIGIN字段中输入原点（授权域），如果填充“*”，则允许任何原点。
+
+在URI字段中输入资源，如果填充“*”，则允许任何拒绝。
+
+GET，POST，PUT，DELETE，HEAD和OPTIONS字段确定允许哪些方法。
+
+必须使用允许的HTTP标头填充HEADER字段。 它们应该用逗号分隔，然后用空格分隔。
 
 ## 设置 FastCGI 服务
 
@@ -202,9 +219,21 @@ End
 REST (Representational State Transfer)
 是一种架构风格，它主张Web应用程序应该按照最初的意图使用HTTP，其中GET，PUT，POST和DELETE请求应分别用于查询，更改，创建和删除。
 
-只要Accept头是“application/json”，Fox Pages Server就会将请求处理为REST。
+只要Accept标头是“application/json”或“application/xml”，Fox Pages Server就会将请求处理为REST。
 
 使用代理帐户登录时，可以在演示网站上的应用程序中找到更多详细信息。
+
+### Boa Plataform
+
+使用Fox Pages Server，您可以构建REST API以满足BOA平台的请求。 您可以在Visual Foxpro中创建一个完整的Web应用程序。 Fox Server Pages将响应BOA发送的请求。 Fox Server Pages和BOA之间发送的数据很容易理解JSON字符串。
+
+设置Visual Fox页面后，您可以测试此组合的功能。 在https://www.BOA-platform.com上或通过以下直接链接启动演示：http：//demo.boa-platform.com。 出现登录屏幕时，您可以使用以下内容：
+
+用户：en
+密码：en01
+API服务器的URL：http：// localhost / boa。 这是您当地的Fox Pages Server。
+
+有关示例源代码，请参阅demo / boa文件夹。
 
 ## 与2.0版本不兼容
 对于FastCGI协议支持，Request和Response对象属性的处理已更改。
@@ -237,6 +266,20 @@ SocketWrench 的自由或商业版本的配置，位于 CORE 目录下的 FOXPAG
 //#DEFINE CSWSOCK_LICENSE_KEY	"INSERT YOUR RUNTIME LICENSE HERE"  
 
 如果你更改了设置，那么你需要重新编译你的项目。
+
+##什么是新的？
+
+### v3.5  - 发布2019.09.02
+
+-  BOA plataform支持
+- 跨源资源共享（CORS）支持
+- 使用安全连接更正数据读取错误
+- 一些重命名的类和财产
+- 安全更新。 SocketWrench控件已更新至9.5版（发行说明，请访问https://sockettools.com/release-notes/）
+
+### v3.1  - 发布2018.06.26
+
+- 安全更新。 SocketWrench控件已更新至9.3版（发行说明，请访问https://sockettools.com/release-notes/）
 
 ## 鸣谢
 

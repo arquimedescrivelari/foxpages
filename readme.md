@@ -1,4 +1,4 @@
-# Fox Pages Server 3.1
+# Fox Pages Server 3.5
 
 [![PTBR](http://flags.fmcdn.net/data/flags/h80/br.png)<br>Português](readme_ptbr.md)
 
@@ -11,6 +11,8 @@ Fox Pages Server (FPS) is a multithreaded HTTP, HTTPS, and FastCGI server for Vi
 With Fox Pages Server you can develop, debug, and distribute web content and applications by using Visual FoxPro.
 
 Fox Pages Server does not allow Visual FoxPro code to run on the Internet. This is why it is necessary to know the language and development tools for internet that will be used, for example: HTML, CSS, Javascript, JQuery, Dojo etc.
+
+Fox Pages Server can be used in combination with the boa-platform. This way you can create Web applications without any knowledge of a web development language. Fox Pages Server communicates with BOA.
 
 ## Requirements
 Microsoft Visual FoxPro 9.0
@@ -102,6 +104,21 @@ The REALM.DBF table sets the access settings for the site folders.
 The USERS.DBF table defines the users who will have access to the folders.
 
 The REALMUSER.DBF table lists users with folders.
+
+### CORS (Cross-Origin Resource Sharing)
+It is a browser mechanism that prevents an origin (domain) from accessing resources in a distinct source (another domain) without authorization.
+
+Configure authorizations by adding, modifying, or deleting records in the CORS.DBF table.
+
+Enter the site that will grant authorization in the SITE field. This field is related to the SITES.DBF table.
+
+Enter the origin (authorized domain) in the ORIGIN field, if it is filled with "*" any origin will be allowed.
+
+Enter the resource in the URI field, if it is filled with "*" any refuse will be allowed.
+
+The GET, POST, PUT, DELETE, HEAD, and OPTIONS fields determine what methods are allowed.
+
+The HEADER field must be populated with the allowed HTTP headers. They should be delimited with a comma followed by a space.
 
 ## Setting up FastCGI servers
 
@@ -203,9 +220,21 @@ End
 ## RESTfull Applications
 REST (Representational State Transfer) is an architectural style that advocates that Web applications should use HTTP as originally intended, where GET, PUT, POST and DELETE requests should be used for query, change, creation, and deletion, respectively.
 
-Fox Pages Server processes a request as REST whenever the Accept header is "application/json".
+Fox Pages Server processes a request as REST whenever the Accept header is "application/json" or "application/xml".
 
 More details can be found in the application available on the demo site when signing in with the representative account.
+
+### BOA Plataform
+
+With Fox Pages Server you can build a REST API to serve the requests of the BOA platform. You can create a complete web application in Visual Foxpro. Fox Server Pages will respond to the requests that are send by BOA. The data that is send between Fox Server Pages and BOA are easy to understand JSON strings.
+
+After setting up your Visual Fox pages, you can test the power of this combination. Start the demo on https://www.BOA-platform.com or by this direct link: http://demo.boa-platform.com. When the login screen appears, you can use the following:
+
+User: en
+Password: en01
+URL of API server: http://localhost/boa. This is your local Fox Pages Server.
+
+See the demo/boa folder for the sample source code.
 
 ## Incompatibility with version 2.0
 For FastCGI protocol support, the processing of Request and Response object properties has been changed.
@@ -240,6 +269,14 @@ The version configuration used, free or commercial, or the version of SocketWren
 You need to recompile the project after you change these settings.
 
 ## What's New?
+
+### v3.5 - Release 2019.06.01
+
+- BOA plataform support
+- Cross-Origin Resource Sharing (CORS) support
+- Correction of data read error with secure connections
+- Some renamed classes and property
+- Security update. SocketWrench control updated to version 9.5 (Release Notes at https://sockettools.com/release-notes/)
 
 ### v3.1 - Release 2018.06.26
 

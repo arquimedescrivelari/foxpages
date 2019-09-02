@@ -33,8 +33,8 @@ DEFINE CLASS Gateway AS CUSTOM
 		This.Parent.Log.Add(2,"Gateway.Destroy")
 		
 		*--- Update ThreadState to connected
-		This.Parent.CallBack.ThreadState = 1
-		This.Parent.CallBack.LastUse = datetime()
+		This.Parent.ServerInterface.ThreadState = 1
+		This.Parent.ServerInterface.LastUse = datetime()
 	ENDPROC
 
 	PROCEDURE Error(nError,cMethod,nLine)

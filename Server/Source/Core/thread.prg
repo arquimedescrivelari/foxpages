@@ -7,7 +7,7 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 	*--- Properties
 	Bandwidth			= 0
 	Buffer				= ""
-	CallBack			= NULL
+	ServerInterface		= NULL
 	CertificateName		= ""
 	CertificateStore	= ""
 	CertificatePassword = ""
@@ -105,18 +105,10 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 
 		*--- Disconnect socket		
 		This.Socket.Disconnect()
-		
-*!*			if inlist(This.Type,"TUNNEL","TUNNEX") AND type("This.Tunnel") = "O"
-*!*				*--- Diconnect tunnel
-*!*				This.Tunnel.Disconnect()
-*!*				
-*!*				*--- Remove Tunnel object
-*!*				This.RemoveObject("Tunnel")
-*!*			endif
 
 		*--- Update ThreadState to disconnected
-		This.CallBack.ThreadState = 0
-		This.CallBack.LastUse = datetime()
+		This.ServerInterface.ThreadState = 0
+		This.ServerInterface.LastUse = datetime()
 	ENDPROC
 
 	PROCEDURE Process(Request AS String)
@@ -185,8 +177,8 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 			endcase
 
 			*--- Update ThreadState to in use
-			This.CallBack.ThreadState = 2
-			This.CallBack.LastUse = datetime()
+			This.ServerInterface.ThreadState = 2
+			This.ServerInterface.LastUse = datetime()
 
 			*--- Open gateways table
 			if !used("gateways")
@@ -264,14 +256,14 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 		*--- Continue processing, multiple requests (Pipelining)
 		m.llProcess = .T.
 		do while !empty(This.Buffer) AND m.llProcess
-			*--- Create WebServer Processor
-			This.NewObject("WebServer","WebServer","core\webserver.fxp")
+			*--- Create Web Processor
+			This.NewObject("Web","Web","core\web.fxp")
 
 			*--- Process received data
-			m.llProcess = This.WebServer.Process()
+			m.llProcess = This.Web.Process()
 
-			*--- Release WebServer Processor
-			This.RemoveObject("WebServer")
+			*--- Release Web Processor
+			This.RemoveObject("Web")
 
 			*--- Reset log
 			This.Log.Reset()
@@ -283,8 +275,8 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 		enddo
 
 		*--- Update ThreadState to connected
-		This.CallBack.ThreadState = 1
-		This.CallBack.LastUse = datetime()
+		This.ServerInterface.ThreadState = 1
+		This.ServerInterface.LastUse = datetime()
 
 		*--- Disconnet
 		if This.IsClosing
@@ -301,21 +293,6 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 	HIDDEN PROCEDURE ShowWhatsThis()
 	HIDDEN PROCEDURE WriteExpression()
 	HIDDEN PROCEDURE WriteMethod()
-ENDDEFINE
-
-******************************************************************************************
-* Thread interface class
-************************
-DEFINE CLASS ThreadInterface AS CUSTOM
-	*--- Last datetime thread was used
-	LastUse = datetime()
-
-	*--- Thread state
-	* 0 - Disconnected
-	* 1 - Connected
-	* 2 - In Use
-	* 3 - Disconnecting
-	ThreadState = 1
 ENDDEFINE
 
 *--- Returns an Unsigned Integer from a Binary String

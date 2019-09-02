@@ -117,7 +117,7 @@ DEFINE CLASS Socket AS CUSTOM
 		DIMENSION laBuffer[1024] AS Byte
 
 		m.lcBuffer = ""
-		do while This.IsReadable
+		do while .T.
 			*--- Reset byte array
 			m.laBuffer = 0
 
@@ -171,6 +171,11 @@ DEFINE CLASS Socket AS CUSTOM
 
 	PROCEDURE OnError(ErrorCode,Description)
 	LOCAL lcMessage,lnSize,lnCtrl
+		*--- This is an alert from SocketWrench. No data in read buffer
+		if m.ErrorCode = 10035
+			return
+		endif
+
 		*--- Connection errors
 		if m.ErrorCode = 10053 OR m.ErrorCode = 10054 OR m.ErrorCode = 10057
 			This.Parent.Disconnect()

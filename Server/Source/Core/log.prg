@@ -55,7 +55,7 @@ DEFINE CLASS Log AS CUSTOM
 *!*			endif
 
 		*--- Check requests log and log level
-		if m.Level > This.Parent.LogLevel AND This.Parent.LogRequests = 0 AND !inlist(This.Event,"Gateway.FCGI.Sent","Gateway.HTTP.Sent","Webserver.FCGI.Sent","Webserver.HTTP.Sent")
+		if m.Level > This.Parent.LogLevel AND This.Parent.LogRequests = 0 AND !inlist(This.Event,"Gateway.FCGI.Sent","Gateway.HTTP.Sent","Web.FCGI.Sent","Web.HTTP.Sent")
 			return
 		endif
 
@@ -68,7 +68,7 @@ DEFINE CLASS Log AS CUSTOM
 		This.Event = m.Event
 
 		*--- New process ID
-		if empty(This.Process) AND This.Event = "Process" && !inlist(This.Event,"Destroy","Disconnect")
+		if empty(This.Process) AND inlist(This.Event,"Accept","Process") && !inlist(This.Event,"Destroy","Disconnect")
 			This.Process = substr(sys(2015),3)
 		endif
 
@@ -92,56 +92,56 @@ DEFINE CLASS Log AS CUSTOM
 		do case
 		case type("This.Parent.Gateway.Request.Data") = "C"
 			This.Request = This.Parent.Gateway.Request.Data
-		case type("This.Parent.WebServer.Request.Data") = "C"
-			This.Request = This.Parent.WebServer.Request.Data
+		case type("This.Parent.Web.Request.Data") = "C"
+			This.Request = This.Parent.Web.Request.Data
 		endcase
 
 		*--- Method
 		do case
 		case type("This.Parent.Gateway.Request.Method") = "C"
 			This.Method = This.Parent.Gateway.Request.Method
-		case type("This.Parent.WebServer.Request.Method") = "C"
-			This.Method = This.Parent.WebServer.Request.Method
+		case type("This.Parent.Web.Request.Method") = "C"
+			This.Method = This.Parent.Web.Request.Method
 		endcase
 
 		*--- Host name
 		do case
 		case type("This.Parent.Gateway.Request.Host") = "C"
 			This.Host = This.Parent.Gateway.Request.Host
-		case type("This.Parent.WebServer.Request.Host") = "C"
-			This.Host = This.Parent.WebServer.Request.Host
+		case type("This.Parent.Web.Request.Host") = "C"
+			This.Host = This.Parent.Web.Request.Host
 		endcase
 
 		*--- URI
 		do case
 		case type("This.Parent.Gateway.Request.Document_URI") = "C"
 			This.URI = This.Parent.Gateway.Request.Document_URI
-		case type("This.Parent.WebServer.Request.Document_URI") = "C"
-			This.URI = This.Parent.WebServer.Request.Document_URI
+		case type("This.Parent.Web.Request.Document_URI") = "C"
+			This.URI = This.Parent.Web.Request.Document_URI
 		endcase
 
 		*--- Bytes
 		do case
 		case type("This.Parent.Gateway.Response.Bytes") = "N"
 			This.Bytes = This.Parent.Gateway.Response.Bytes
-		case type("This.Parent.WebServer.Response.Bytes") = "N"
-			This.Bytes = This.Parent.WebServer.Response.Bytes
+		case type("This.Parent.Web.Response.Bytes") = "N"
+			This.Bytes = This.Parent.Web.Response.Bytes
 		endcase
 
 		*--- Reponse code
 		do case
 		case type("This.Parent.Gateway.Response.Status_Code") = "C"
 			This.Code = This.Parent.Gateway.Response.Status_Code
-		case type("This.Parent.WebServer.Response.Status_Code") = "C"
-			This.Code = This.Parent.WebServer.Response.Status_Code
+		case type("This.Parent.Web.Response.Status_Code") = "C"
+			This.Code = This.Parent.Web.Response.Status_Code
 		endcase
 
 		*--- Reponse
 		do case
 		case type("This.Parent.Gateway.Response.Header") = "C"
 			This.Response = This.Parent.Gateway.Response.Header
-		case type("This.Parent.WebServer.Response.Header") = "C"
-			This.Response = This.Parent.WebServer.Response.Header
+		case type("This.Parent.Web.Response.Header") = "C"
+			This.Response = This.Parent.Web.Response.Header
 		endcase
 
 		*--- Message
@@ -151,7 +151,7 @@ DEFINE CLASS Log AS CUSTOM
 		lcAlias = alias()
 
 		*--- Acvtivity Log
-		if This.Parent.LogRequests = 1 AND inlist(This.Event,"Gateway.FCGI.Sent","Gateway.HTTP.Sent","Webserver.FCGI.Sent","Webserver.HTTP.Sent")
+		if This.Parent.LogRequests = 1 AND inlist(This.Event,"Gateway.FCGI.Sent","Gateway.HTTP.Sent","Web.FCGI.Sent","Web.HTTP.Sent")
 			*--- Log tables name
 			lcLogFile = "LOG_"+dtos(date())+"_"+substr(time(),1,2)+"_REQUESTS"
 

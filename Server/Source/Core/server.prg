@@ -300,10 +300,13 @@ DEFINE CLASS Server AS CUSTOM OLEPUBLIC
 		endif
 
 		*--- Create thread interface
-		m.loThreadInterface = newobject("ThreadInterface","core\thread.fxp")
+		m.loThreadInterface = newobject("ThreadInterface")
 
+		*--- Set thread interface properties
+		m.loThreadInterface.ThreadIndex = m.lnThread
+		
 		*--- Set Callback
-		m.loThread.CallBack = m.loThreadInterface
+		m.loThread.ServerInterface = m.loThreadInterface
 
 		*--- Set thread properties
 		m.loThread.ServerID    = This.ServerID
@@ -405,5 +408,31 @@ DEFINE CLASS ServerProc AS TIMER
 				endif
 			endif
 		next
+	ENDPROC
+ENDDEFINE
+
+******************************************************************************************
+* Thread interface class
+************************
+DEFINE CLASS ThreadInterface AS CUSTOM
+	*--- Last datetime thread was used
+	LastUse = datetime()
+
+	*--- Thread index
+	ThreadIndex = 0
+
+	*--- Thread state
+	* 0 - Disconnected
+	* 1 - Connected
+	* 2 - In Use
+	* 3 - Disconnecting
+	ThreadState = 1
+	
+	PROCEDURE Event(Data AS String)
+		m.ApplicationServer.Process(This.ThreadIndex, m.Data)
+	ENDPROC
+
+	PROCEDURE Error(nError,cMethod,nLine)
+		strtofile("Method: "+proper(m.cMethod)+CRLF+"Message: "+message(),"\error.log")
 	ENDPROC
 ENDDEFINE

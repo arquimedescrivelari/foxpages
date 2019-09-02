@@ -12,7 +12,7 @@ DEFINE CLASS HTMLProcessor AS SESSION
 
 	PROCEDURE Init()
 		*--- Debug log
-		This.Parent.Parent.Log.Add(3,"Webserver.HTML.Init")
+		This.Parent.Parent.Log.Add(3,"Web.HTML.Init")
 
 		*--- Sets
 		set deleted on
@@ -22,7 +22,7 @@ DEFINE CLASS HTMLProcessor AS SESSION
 
 	PROCEDURE Destroy()
 		*--- Debug log
-		This.Parent.Parent.Log.Add(3,"Webserver.HTML.Destroy")
+		This.Parent.Parent.Log.Add(3,"Web.HTML.Destroy")
 	ENDPROC
 
 	PROCEDURE Error(nError,cMethod,nLine)
@@ -39,7 +39,7 @@ DEFINE CLASS HTMLProcessor AS SESSION
 		next
 
 		*--- Debug log
-		This.Parent.Parent.Log.Add(0,"Webserver.HTML.Error",strtran(m.lcMessage,"<BR>",CRLF))
+		This.Parent.Parent.Log.Add(0,"Web.HTML.Error",strtran(m.lcMessage,"<BR>",CRLF))
 
 		*--- Send error
 		This.Parent.SendError("500","Internal Server Error","RUNTIME ERROR",m.lcMessage)
@@ -48,7 +48,7 @@ DEFINE CLASS HTMLProcessor AS SESSION
 	PROCEDURE Process(File AS String)
 	LOCAL lnDirs
 		*--- Debug log
-		This.Parent.Parent.Log.Add(3,"Webserver.HTML.Process")
+		This.Parent.Parent.Log.Add(3,"Web.HTML.Process")
 
 		*--- Work directory
 		This.Directory = This.Parent.Directory
@@ -89,13 +89,17 @@ DEFINE CLASS HTMLProcessor AS SESSION
 			endif
 		endif
 
+		*--- Set path directory
+		set path to (This.Directory)
+
 		*--- Add / to directory
 		This.Directory = This.Directory+"/"
 
-		*--- Set path directory
-		set path to (This.Directory)
-		for m.lnDirs = 3 to adir(aDirs,This.Directory+"*.*","D")
-			if aDirs[m.lnDirs,5] = "....D"
+		for m.lnDirs = 1 to adir(aDirs,This.Directory+"*.*","D")
+			if aDirs[m.lnDirs,1] = "."
+				loop
+			endif
+			if "D" $ aDirs[m.lnDirs,5]
 				set path to (This.Directory+aDirs[m.lnDirs,1]) additive
 			endif
 		next
@@ -154,7 +158,7 @@ DEFINE CLASS HTMLProcessor AS SESSION
 
 	PROCEDURE Include(File AS String)
 		*--- Debug log
-		This.Parent.Parent.Log.Add(3,"Webserver.HTML.Include")
+		This.Parent.Parent.Log.Add(3,"Web.HTML.Include")
 
 		*--- Insert directory into file
 		m.File = This.Directory+m.File
@@ -260,7 +264,7 @@ DEFINE CLASS HTMLProcessor AS SESSION
 					delete file (m.lcFXPFile)
 
 					*--- Debug log
-					This.Parent.Parent.Log.Add(0,"Webserver.HTML.Error",filetostr(m.lcERRFile))
+					This.Parent.Parent.Log.Add(0,"Web.HTML.Error",filetostr(m.lcERRFile))
 
 					*--- Send error
 					This.Parent.SendError("500","Internal Server Error","COMPILATION ERROR",strtran(filetostr(m.lcERRFile),CRLF,"<BR>"))
