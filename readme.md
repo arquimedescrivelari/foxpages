@@ -272,7 +272,7 @@ You need to recompile the project after you change these settings.
 
 ## What's New?
 
-### v3.5 - Release 2019.06.01
+### v3.5 - Release 2019.09.02
 
 - BOA plataform support
 - Cross-Origin Resource Sharing (CORS) support
