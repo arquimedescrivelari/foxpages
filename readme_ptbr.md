@@ -222,7 +222,7 @@ O Fox Pages Server processa uma requisição como REST sempre que o header Accep
 
 Mais detalhes podem ser encontrados no aplicativo disponível no site de demonstração ao entrar com a conta do representante.
 
-### BOA Plataform
+### BOA Platform
 
 Com Fox Pages Server você pode criar uma API REST para responder requisições da plataforma BOA. Você pode criar uma aplicação web completa usando o Visual Foxpro. O Fox Server Pages responderá as requisições que são enviadas pela plataforma BOA. Os dados que são trocados entre o Fox Pages Server e o BOA são strings JSON que são fáceis de entender.
 

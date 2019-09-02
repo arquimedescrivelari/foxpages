@@ -223,7 +223,7 @@ REST (Representational State Transfer)
 
 使用代理帐户登录时，可以在演示网站上的应用程序中找到更多详细信息。
 
-### Boa Plataform
+### Boa Platform
 
 使用Fox Pages Server，您可以构建REST API以满足BOA平台的请求。 您可以在Visual Foxpro中创建一个完整的Web应用程序。 Fox Server Pages将响应BOA发送的请求。 Fox Server Pages和BOA之间发送的数据很容易理解JSON字符串。
 

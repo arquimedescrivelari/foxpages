@@ -224,7 +224,7 @@ Fox Pages Server processes a request as REST whenever the Accept header is "appl
 
 More details can be found in the application available on the demo site when signing in with the representative account.
 
-### BOA Plataform
+### BOA Platform
 
 With Fox Pages Server you can build a REST API to serve the requests of the BOA platform. You can create a complete web application in Visual Foxpro. Fox Server Pages will respond to the requests that are send by BOA. The data that is send between Fox Server Pages and BOA are easy to understand JSON strings.
 
