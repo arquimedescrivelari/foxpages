@@ -203,7 +203,7 @@ DEFINE CLASS Thread AS CUSTOM OLEPUBLIC
 				This.Gateway.Process()
 			else
 				*--- On development mode requests must be queued to avoid conflicts when debbuging
-				if This.StartMode = 0 AND (justext(m.lcURI) = "fxp" OR "application/json" $ m.lcAccept)
+				if This.StartMode = 0 AND (justext(m.lcURI) = "fxp" OR "application/json" $ m.lcAccept OR "application/xml" $ m.lcAccept)
 					*--- This is a FXP or REST request, put in queue
 					This.Queued = .T.
 				else
