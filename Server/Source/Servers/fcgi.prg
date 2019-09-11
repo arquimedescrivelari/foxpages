@@ -3,8 +3,8 @@
 *--- Change window caption
 _VFP.Caption = FOX_PAGES_VERSION+" - FCGI"
 
-*--- Set path
-set path to "core"
+*--- Compile programs
+compile ..\core\*.prg
 
 *--- Create server
 PUBLIC FPServer
