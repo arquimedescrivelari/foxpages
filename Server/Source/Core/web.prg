@@ -383,8 +383,13 @@ DEFINE CLASS Web AS CUSTOM
 						This.Response.Status_Code        = "200"
 						This.Response.Status_Description = "OK"
 
-						*--- Read file
-						This.Response.FileName = This.Directory+This.Request.Document_URI
+						if "deflate" $ This.Request.Accept_Encoding AND justext(This.Request.Document_URI) $ ";css;htm;html;js;"
+							*--- Read file for compression
+							This.Response.OutPut = filetostr(This.Directory+This.Request.Document_URI)
+						else
+							*--- Define file to send
+							This.Response.FileName = This.Directory+This.Request.Document_URI
+						endif
 
 						*--- Define MIME format
 						This.Response.Content_Type = strextract(This.Mime,"|"+justext(This.Request.Document_URI)+"|","|")

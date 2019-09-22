@@ -1,4 +1,4 @@
-# Fox Pages Server 3.5
+# Fox Pages Server 3.5.1
 
 ## O que é isto?
 
@@ -269,6 +269,10 @@ A configuração versão utilizada, gratuita ou comercial, ou a versão do Socke
 É necessário recompilar o projeto após alterar estas configurações.
 
 ## Novidades?
+
+### v3.5.1 - Lançamento 2019.09.22
+
+- Corrige problemas de compressão
 
 ### v3.5 - Lançamento 2019.09.02
 

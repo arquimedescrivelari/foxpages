@@ -1,4 +1,4 @@
-# Fox Pages Server 3.5
+# Fox Pages Server 3.5.1
 
 [![PTBR](http://flags.fmcdn.net/data/flags/h80/br.png)<br>Português](readme_ptbr.md)
 
@@ -272,9 +272,13 @@ You need to recompile the project after you change these settings.
 
 ## What's New?
 
+### v3.5.1 - Release 2019.09.22
+
+- Fix compression issues
+
 ### v3.5 - Release 2019.09.02
 
-- BOA plataform support
+- BOA platform support
 - Cross-Origin Resource Sharing (CORS) support
 - Correction of data read error with secure connections
 - Some renamed classes and property
